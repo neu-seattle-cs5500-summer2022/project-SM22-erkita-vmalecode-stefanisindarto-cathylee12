@@ -1,9 +1,9 @@
-// import express from "express";
-// import { signIn, signUp } from "../controllers/user.js";
+import express from "express";
+import * as flashcardControllers from "../controllers/flashcard.js";
 
-// const router = express.Router();
+const flashcardRouter = express.Router();
 
-// router.post("/signIn", signIn);
-// router.post("/signUp", signUp);
+flashcardRouter.post("/", flashcardControllers.createCard);
+flashcardRouter.get("/", flashcardControllers.getCards);
 
-// export default router;
+export default flashcardRouter;
