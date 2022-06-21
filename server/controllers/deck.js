@@ -1,54 +1,69 @@
-import mongoose from "mongoose";
-import DeckSchema from "../models/deck.js";
+// import mongoose from "mongoose";
+// import DeckSchema from "../models/deck.js";
+const mongoose = require("mongoose");
+const { modelName } = require("../models/deck.js");
+const DeckSchema = require("../models/deck.js");
 
-export const createDeck = async (req, res) => {
-  const body = req.body;
+function createDeck(req, res) {
+  const deck = req.body;
   const newDeck = new DeckSchema({
-    ...body,
-    user: req.userId,
-    lastReviewed: Date.now.toISOString(),
-    dateCreated: new Date().toISOString(),
+    name: deck.name,
+    // userId: req.userId,
+    lastReviewed: new Date().now,
+    dateCreated: new Date(),
   });
   try {
-    await newDeck.save();
-    res.status(201).json(newPost);
+    newDeck.save();
+    res.status(201).json(newDeck);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
-};
+}
 
-export const getDeck = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const foundDeck = await DeckSchema.findById(id);
-    res.status(200).json(foundDeck);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+function getDeck(req, res) {
+  res.send("get deck");
+  //   const { id } = req.params;
+  //   try {
+  //     const foundDeck = await DeckSchema.findById(id);
+  //     res.status(200).json(foundDeck);
+  //   } catch (error) {
+  //     res.status(404).json({ message: error.message });
+  //   }
+}
 
-export const getDecks = async (req, res) => {
+async function getDecks(req, res) {
   try {
     const decks = await DeckSchema.find();
     res.status(200).json(decks);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ message2: error.message });
   }
-};
+}
 
-export const updateDeckName = async (req, res) => {
-  const oldDeckName = req.params;
-  const newDeckName = req.body;
-  if (!mongoose.Types.ObjectId.isValid(_id)) {
-    return res.status(404).send("no deck with ID: " + _id);
-  }
-  DeckSchema.findOneAndUpdate(
-    { name: oldDeckName },
-    { name: newDeckName },
-    { upsert: true },
-    function (err, doc) {
-      if (err) return res.send(500, { error: err });
-      return res.json(updatedDeck);
-    }
-  );
-};
+// export const updateDeckName = async (req, res) => {
+//   const oldDeckName = req.params;
+//   const newDeckName = req.body;
+//   if (!mongoose.Types.ObjectId.isValid(_id)) {
+//     return res.status(404).send("no deck with ID: " + _id);
+//   }
+//   DeckSchema.findOneAndUpdate(
+//     { name: oldDeckName },
+//     { name: newDeckName },
+//     { upsert: true },
+//     function (err, doc) {
+//       if (err) return res.send(500, { error: err });
+//       return res.json(updatedDeck);
+//     }
+//   );
+// };
+
+// export const deleteDeck= async (req, res) => {
+//   const { id } = req.params;
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     return res.status(404).send("no deck with ID: " + id);
+//   }
+//   await DeckSchema.findByIdAndRemove(id);
+//   res.json({ message: "Deck deleted." });
+// };
+
+module.exports = { createDeck, getDeck, getDecks };
