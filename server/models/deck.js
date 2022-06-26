@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const deckSchema = mongoose.Schema({
   userId: { type: String },
-  name: { type: String },
+  name: { type: String, required: true },
   recallabilityPercentage: { type: Number, min: 0, max: 100, default: 0 },
   lastReviewed: { type: Date, default: Date.now },
   dateCreated: { type: Date, default: new Date() },
