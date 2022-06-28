@@ -1,9 +1,16 @@
-// import express from "express";
-// import { signIn, signUp } from "../controllers/user.js";
+const express = require("express");
+const flashcardController = require("../controllers/flashcard.js");
 
-// const router = express.Router();
+const flashcardRouter = express.Router();
 
-// router.post("/signIn", signIn);
-// router.post("/signUp", signUp);
+flashcardRouter.post("/", flashcardController.createCard);
+flashcardRouter.get("/:id", flashcardController.getCard);
+flashcardRouter.get("/", flashcardController.getCards);
+flashcardRouter.get("/:id/front", flashcardController.getFront);
+flashcardRouter.get("/:id/back", flashcardController.getBack);
+flashcardRouter.delete("/:id", flashcardController.deleteCard);
+flashcardRouter.patch("/:id/front", flashcardController.updateFront);
+flashcardRouter.patch("/:id/back", flashcardController.updateBack);
+flashcardRouter.patch("/:id/recallability", flashcardController.updateRecallability);
 
-// export default router;
+module.exports = flashcardRouter;
