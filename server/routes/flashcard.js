@@ -1,16 +1,16 @@
-import express from "express";
-import * as flashcardControllers from "../controllers/flashcard.js";
+const express = require("express");
+const flashcardController = require("../controllers/flashcard.js");
 
 const flashcardRouter = express.Router();
 
-flashcardRouter.post("/", flashcardControllers.createCard);
-flashcardRouter.get("/:id", flashcardControllers.getCard);
-flashcardRouter.get("/", flashcardControllers.getCards);
-flashcardRouter.get("/:id/front", flashcardControllers.getFront);
-flashcardRouter.get("/:id/back", flashcardControllers.getBack);
-flashcardRouter.delete("/:id", flashcardControllers.deleteCard);
-flashcardRouter.patch("/:id/front", flashcardControllers.updateFront);
-flashcardRouter.patch("/:id/back", flashcardControllers.updateBack);
-flashcardRouter.patch("/:id/recallability", flashcardControllers.updateRecallability);
+flashcardRouter.post("/", flashcardController.createCard);
+flashcardRouter.get("/:id", flashcardController.getCard);
+flashcardRouter.get("/", flashcardController.getCards);
+flashcardRouter.get("/:id/front", flashcardController.getFront);
+flashcardRouter.get("/:id/back", flashcardController.getBack);
+flashcardRouter.delete("/:id", flashcardController.deleteCard);
+flashcardRouter.patch("/:id/front", flashcardController.updateFront);
+flashcardRouter.patch("/:id/back", flashcardController.updateBack);
+flashcardRouter.patch("/:id/recallability", flashcardController.updateRecallability);
 
-export default flashcardRouter;
+module.exports = flashcardRouter;

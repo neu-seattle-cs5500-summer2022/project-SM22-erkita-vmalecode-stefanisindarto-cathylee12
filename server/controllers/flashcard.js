@@ -1,6 +1,6 @@
-import Flashcard from "../models/flashcard.js";
+const Flashcard = require("../models/flashcard.js");
 
-export const createCard = async (req, res) => {
+async function createCard(req, res) {
     const newCard = new Flashcard({
         front: req.body.front,
         back: req.body.back
@@ -13,7 +13,7 @@ export const createCard = async (req, res) => {
     }
 };
 
-export const getCard = async (req, res) => {
+async function getCard(req, res) {
     const { id } = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -23,7 +23,7 @@ export const getCard = async (req, res) => {
     }
 };
 
-export const getCards = async (req, res) => {
+async function getCards(req, res) {
     try {
         const cards = await Flashcard.find();
         res.status(200).json(cards);
@@ -32,7 +32,7 @@ export const getCards = async (req, res) => {
     }
 };
 
-export const getFront = async (req, res) => {
+async function getFront(req, res) {
     const { id } = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -42,7 +42,7 @@ export const getFront = async (req, res) => {
     }
 };
 
-export const getBack = async (req, res) => {
+async function getBack(req, res) {
     const { id } = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -52,7 +52,7 @@ export const getBack = async (req, res) => {
     }
 };
 
-export const deleteCard = async (req, res) => {
+async function deleteCard(req, res) {
     const {id} = req.params;
     try {
         await Flashcard.findByIdAndRemove(id);
@@ -62,7 +62,7 @@ export const deleteCard = async (req, res) => {
     }
 };
 
-export const updateFront = async (req, res) => {
+async function updateFront(req, res) {
     const {id} = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -74,7 +74,7 @@ export const updateFront = async (req, res) => {
     }
 };
 
-export const updateBack = async (req, res) => {
+async function updateBack(req, res) {
     const {id} = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -86,7 +86,7 @@ export const updateBack = async (req, res) => {
     }
 };
 
-export const updateRecallability = async (req, res) => {
+async function updateRecallability(req, res) {
     const {id} = req.params;
     try {
         const card = await Flashcard.findById(id);
@@ -97,3 +97,6 @@ export const updateRecallability = async (req, res) => {
         res.status(404).json({ message: err.message });
     }
 };
+
+module.exports = { createCard, getCard, getCards, getFront, getBack,
+    deleteCard, updateFront, updateBack, updateRecallability };

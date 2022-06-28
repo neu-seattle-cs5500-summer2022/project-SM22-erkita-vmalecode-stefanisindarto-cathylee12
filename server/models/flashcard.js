@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const flashcardSchema = mongoose.Schema({
   front: {
@@ -16,6 +16,4 @@ const flashcardSchema = mongoose.Schema({
   },
 });
 
-const Flashcard = mongoose.model("Flashcard", flashcardSchema);
-
-export default Flashcard;
+module.exports = mongoose.model("Flashcard", flashcardSchema);
