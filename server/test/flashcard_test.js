@@ -10,27 +10,6 @@ chai.use(chaiHttp);
 
 describe('Flashcard API', () => {
 
-    // SET UP
-    /*
-    describe("SET UP", () => {
-        before("Empty the DB", (done) => {
-            Flashcard.deleteMany({}, (err) => {
-                done();
-            });
-        });
-
-        it("Assert the DB is empty", (done) => {
-            chai.request(app)
-                .get("/decks/cards")
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.empty;
-                    done();
-                });
-        });
-    });
-    */
-
     // POST
     let cardID1;
     let cardID2;
@@ -155,25 +134,6 @@ describe('Flashcard API', () => {
                     res.body.should.have.property('_id').eql(cardID1);
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "Computer",
-                back: "Science"
-            })
-            card.save((err, res) => {
-                chai.request(app)
-                    .get("/" + card.id)
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('front').eql("Computer");
-                        res.body.should.have.property('back').eql("Science");
-                        res.body.should.have.property('recallability').eql("again");
-                        res.body.should.have.property('_id').eql(card.id);
-                        done();
-                    });
-            });
-            */
         });
     });
 
@@ -187,21 +147,6 @@ describe('Flashcard API', () => {
                     res.body.should.be.a('string').eql("1 + 1 = ?");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "This is front",
-                back: "This is back"
-            })
-            card.save((err, res) => {
-                chai.request(app)
-                    .get("/" + card.id + "/front")
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('string').eql("This is front");
-                        done();
-                    });
-            });
-            */
         });
     });
 
@@ -215,21 +160,6 @@ describe('Flashcard API', () => {
                     res.body.should.be.a('string').eql("2");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "This is front",
-                back: "This is back"
-            })
-            card.save((err, res) => {
-                chai.request(app)
-                    .get("/" + card.id + "/back")
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('string').eql("This is back");
-                        done();
-                    });
-            });
-            */
         });
     });
 
@@ -274,26 +204,6 @@ describe('Flashcard API', () => {
                     res.body.should.have.property('back').eql("2");
                     done();
                 });
-            
-            /*
-            let card = new Flashcard({
-                front: "To be updated",
-                back: "Same"
-            });
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/front")
-                    .send({
-                        "front": "updated!"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('front').eql("updated!");
-                        done();
-                    });
-            });
-            */
         });
 
         it("SHOULD NOT PATCH the front of a card with back input", (done) => {
@@ -309,26 +219,6 @@ describe('Flashcard API', () => {
                         .eql("Flashcard validation failed: front: Path `front` is required.");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "To be updated",
-                back: "Same"
-            });
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/front")
-                    .send({
-                        "back": "updated!"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(404);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('message')
-                            .eql("Flashcard validation failed: front: Path `front` is required.");
-                        done();
-                    });
-            });
-            */
         });
     });
 
@@ -353,25 +243,6 @@ describe('Flashcard API', () => {
                     res.body.should.have.property('back').eql("updated!");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "Same",
-                back: "To be updated"
-            });
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/back")
-                    .send({
-                        "back": "updated!"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('back').eql("updated!");
-                        done();
-                    });
-            });
-            */
         });
 
         it("SHOULD NOT PATCH the back of a card with front input", (done) => {
@@ -387,26 +258,6 @@ describe('Flashcard API', () => {
                         .eql("Flashcard validation failed: back: Path `back` is required.");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "Same",
-                back: "To be updated"
-            });
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/back")
-                    .send({
-                        "front": "updated!"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(404);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('message')
-                            .eql("Flashcard validation failed: back: Path `back` is required.");
-                        done();
-                    });
-            });
-            */
         });
     });
 
@@ -429,25 +280,6 @@ describe('Flashcard API', () => {
                     res.body.should.have.property('recallability').eql("hard");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "Same front",
-                back: "Same back"
-            })
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/recallability")
-                    .send({
-                        "recallability": "hard"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('recallability').eql("hard");
-                        done();
-                    });
-            });
-            */
         });
 
         it("SHOULD NOT PATCH the recallability with a non-existing recallability", (done) => {
@@ -464,27 +296,6 @@ describe('Flashcard API', () => {
                                 "`medium` is not a valid enum value for path `recallability`.");
                     done();
                 });
-            /*
-            let card = new Flashcard({
-                front: "Same front",
-                back: "Same back"
-            })
-            card.save((err, res) => {
-                chai.request(app)
-                    .patch("/" + card.id + "/recallability")
-                    .send({
-                        "recallability": "medium"
-                    })
-                    .end((err, res) => {
-                        res.should.have.status(404);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('message')
-                            .eql("Flashcard validation failed: recallability: " +
-                                 "`medium` is not a valid enum value for path `recallability`.");
-                        done();
-                    });
-            });
-            */
         });
     });
 
