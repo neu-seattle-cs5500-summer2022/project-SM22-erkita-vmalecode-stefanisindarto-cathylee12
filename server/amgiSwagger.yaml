@@ -1,0 +1,284 @@
+swagger: "2.0"
+info:
+  description: "Amgi (flashcard study app) APIs for deck, flashcard, and user."
+  version: "1.0.0"
+  title: "Amgi API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    name: "Amgi Team Github"
+    url: "https://github.com/neu-seattle-cs5500-summer2022/project-SM22-erkita-vmalecode-stefanisindarto-cathylee12"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "amgi.swagger.io"
+basePath: "/v2"
+tags:
+- name: "deck"
+  description: "Manage flashcard decks here"
+- name: "flashcards"
+  description: "Access to flashcards"
+- name: "user"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about flashcard app"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /deck:
+    post:
+      tags:
+      - "deck"
+      summary: "Add a new deck"
+      description: ""
+      operationId: "createDeck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "deck name"
+        description: "Required deck name"
+        required: true
+        schema:
+          $ref: "#/definitions/Deck"
+      responses:
+        "201":
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Deck"
+        "409":
+          description: "Name cannot be empty"
+        "404":
+          description: "Valid name required"
+      "security": []
+    get:
+      tags:
+      - "deck"
+      summary: "Get all decks"
+      description: ""
+      operationId: "getDecks"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "Successfully retrieved decks"
+          schema:
+            $ref: "#/definitions/Deck"
+        "404":
+          description: "Decks does not exist"
+      security: []
+  /deck/{deckId}:
+    get:
+      tags:
+      - "deck"
+      summary: "Get deck with specified deckId"
+      description: ""
+      operationId: "getDeck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deckId"
+        in: "path"
+        description: "ID of deck to retrieve"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Successfully retrieved deck"
+          schema:
+            $ref: "#/definitions/Deck"
+        "404":
+          description: "Deck with ID "
+      security: []
+    patch:
+      tags:
+      - "deck"
+      summary: "Patch specified deck name"
+      description: ""
+      operationId: "updateDeckName"
+      parameters:
+      - name: "deckId"
+        in: "path"
+        description: "ID of deck to retrieve"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Successfully changed deck name"
+          schema:
+            $ref: "#/definitions/Deck"
+        "404":
+          description: "Valid name required"
+      security: []
+    delete:
+      tags:
+      - "deck"
+      summary: "Delete specified deck"
+      description: ""
+      operationId: "deleteDeck"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deckId"
+        in: "path"
+        description: "ID of deck to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Deck deleted"
+        "404":
+          description: "Could not delete deck with invalid ID"
+      security: []
+  
+  
+
+  /deck/{deckId}/card:
+  	post:
+    	tags:
+      - "flashcard"
+      	summary: "Add a new flashcard"
+        description: "Add a new flashcard to specified deck"
+        operationId: "createCard"
+        consumes:
+        - "applicaiton/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+  				front: "front content"
+          back: "back content"
+          description: ""
+          required: true
+          schema:
+          	$ref: "#/definitions/Flashcard"
+        responses:
+          "201":
+          	schema:
+            	$ref: "#/definitions/Flashcard"
+            "409":
+              description: "Front or back field cannot be empty"
+        "security": []
+      	
+	/user/login:
+    post:
+      tags:
+      - “login"
+      summary: “Authenticating user"
+      description: "User login"
+      operationId: “login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: “email"
+        description: "Required email"
+        required: true
+			- name: “password"
+        description: "Required password"
+        required: true
+      responses:
+      	"200":
+        	schema:
+          	$ref: "#/definitions/User”
+					token: jwt
+        “500":
+        	description: “Something went wrong."
+      "security": []
+	/user/signup:
+    post:
+      tags:
+      - “signup"
+      summary: “Add a user"
+      description: "User signup"
+      operationId: “signup"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: “email"
+        description: "Required email"
+        required: true
+      - name: “password"
+        description: “Required password"
+        required: true
+      - name: “confirmPassword"
+        description: “Confirm password"
+        required: true
+      - name: “firstName"
+        description: “Required first name"
+        required: true
+      - name: “lastName"
+        description: “Required last name"
+        required: true
+      responses:
+      	"200":
+        	schema:
+          	$ref: "#/definitions/User"
+        “500":
+        	description: “Something went wrong."
+      "security": []
+	      
+
+definitions:
+  Deck:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      name:
+        type: "string"
+      recallabilityPercentage:
+        type: "number"
+      lastReviewed:
+        type: "string"
+        format: "date-time"
+      dateCreated:
+        type: "string"
+        format: "date-time"
+    xml:
+      name: "Deck"
+  Flashcard:
+    type: "object"
+    properties:
+      front:
+        type: "string"
+      back:
+        type: "string"
+      recallability:
+        type: "string"
+        format: "enum"
+    xml:
+      name: "Flashcard"
+  User:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      id:
+        type: "string"
+    xml:
+      name: "User"
+      
+      
+      
+      
+      
+      
+      
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
