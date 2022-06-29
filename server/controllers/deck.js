@@ -20,7 +20,7 @@ function onlyContainsSpecialCharacters(req, res) {
 
 function isValidName(req, res) {
   if (
-    !onlyContainsSpecialCharacters(req, res) &&
+    !onlyContainsWhiteSpace(req, res) &&
     !onlyContainsSpecialCharacters(req, res)
   ) {
     return true;
