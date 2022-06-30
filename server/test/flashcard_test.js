@@ -2,6 +2,8 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const app = require("../index.js");
 const Flashcard = require("../models/flashcard");
+const Deck = require("../models/deck");
+const deck = require("../models/deck");
 
 //Assertion Style
 chai.should();
@@ -10,15 +12,32 @@ chai.use(chaiHttp);
 
 describe('Flashcard API', () => {
 
-    // POST
     let cardID1;
     let cardID2;
     let cardID3;
+    let deckID;
+
+    describe("Create a test deck", () => {
+        it("", (done) => {
+            chai.request(app)
+                .post("/decks")
+                .send({
+                    "name": "test deck"
+                })
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    deckID = res.body['_id'];
+                    done();
+                });
+        });
+    });
+
+    // POST
     describe("POST", () => {
 
         it("POST a card1", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "front": "1 + 1 = ?",
                     "back": "2"
@@ -36,7 +55,7 @@ describe('Flashcard API', () => {
 
         it("POST a card2", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "front": "Bonjour",
                     "back": "Hello"
@@ -52,7 +71,7 @@ describe('Flashcard API', () => {
 
         it("POST a card3", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "front": "Au revoir",
                     "back": "See you next time!"
@@ -68,7 +87,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT post this card without FRONT field", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "back": "This is back"
                 })
@@ -80,7 +99,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT post this card without BACK field", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "front": "This is front"
                 })
@@ -92,7 +111,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT post this card with an empty string", (done) => {
             chai.request(app)
-                .post("/decks/cards")
+                .post("/decks/" + deckID + "/cards")
                 .send({
                     "front": "",
                     "back": ""
@@ -108,7 +127,7 @@ describe('Flashcard API', () => {
     describe("GET", () => {
         it("GET all the cards", (done) => {
             chai.request(app)
-                .get("/decks/cards")
+                .get("/decks/" + deckID + "/cards")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -124,7 +143,7 @@ describe('Flashcard API', () => {
     describe("GET By ID", () => {
         it("GET a card with the given ID", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID1)
+                .get("/decks/" + deckID + "/cards/" + cardID1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -141,7 +160,7 @@ describe('Flashcard API', () => {
     describe("GET Front By ID", () => {
         it("GET a front of the card with the given ID", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID1 + "/front")
+                .get("/decks/" + deckID + "/cards/" + cardID1 + "/front")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('string').eql("1 + 1 = ?");
@@ -154,7 +173,7 @@ describe('Flashcard API', () => {
     describe("GET Back By ID", () => {
         it("GET a back of the card with the given ID", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID1 + "/back")
+                .get("/decks/" + deckID + "/cards/" + cardID1 + "/back")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('string').eql("2");
@@ -172,7 +191,7 @@ describe('Flashcard API', () => {
             });
             card.save((err, res) => {
                 chai.request(app)
-                    .delete("/decks/cards/" + card.id)
+                    .delete("/decks/" + deckID + "/cards/" + card.id)
                     .end((err, res) => {
                         res.should.have.status(200);
                         res.body.should.be.a('object');
@@ -187,13 +206,13 @@ describe('Flashcard API', () => {
     describe("PATCH Front By ID", () => {
         it("PATCH the front of a card with the given ID and new string", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID1)
+                .get("/decks/" + deckID + "/cards/" + cardID1)
                 .end((err, res) => {
                     res.body.should.have.property('front').eql("1 + 1 = ?");
                     res.body.should.have.property('back').eql("2");
                 });
             chai.request(app)
-                .patch("/decks/cards/" + cardID1 + "/front")
+                .patch("/decks/" + deckID + "/cards/" + cardID1 + "/front")
                 .send({
                     "front": "updated!"
                 })
@@ -208,7 +227,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT PATCH the front of a card with back input", (done) => {
             chai.request(app)
-                .patch("/decks/cards/" + cardID1 + "/front")
+                .patch("/decks/" + deckID + "/cards/" + cardID1 + "/front")
                 .send({
                     "back": "updated!"
                 })
@@ -226,13 +245,13 @@ describe('Flashcard API', () => {
     describe("PATCH Back By ID", () => {
         it("PATCH the back of a card with the given ID and new string", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID2)
+                .get("/decks/" + deckID + "/cards/" + cardID2)
                 .end((err, res) => {
                     res.body.should.have.property('front').eql("Bonjour");
                     res.body.should.have.property('back').eql("Hello");
                 });
             chai.request(app)
-                .patch("/decks/cards/" + cardID2 + "/back")
+                .patch("/decks/" + deckID + "/cards/" + cardID2 + "/back")
                 .send({
                     "back": "updated!"
                 })
@@ -247,7 +266,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT PATCH the back of a card with front input", (done) => {
             chai.request(app)
-                .patch("/decks/cards/" + cardID2 + "/back")
+                .patch("/decks/" + deckID + "/cards/" + cardID2 + "/back")
                 .send({
                     "front": "updated!"
                 })
@@ -265,12 +284,12 @@ describe('Flashcard API', () => {
     describe("PATCH Recallability by ID", () => {
         it("PATCH the recallability of a card with the given ID and recallability", (done) => {
             chai.request(app)
-                .get("/decks/cards/" + cardID2)
+                .get("/decks/" + deckID + "/cards/" + cardID2)
                 .end((err, res) => {
                     res.body.should.have.property('recallability').eql("again");
                 });
             chai.request(app)
-                .patch("/decks/cards/" + cardID2 + "/recallability")
+                .patch("/decks/" + deckID + "/cards/" + cardID2 + "/recallability")
                 .send({
                     "recallability": "hard"
                 })
@@ -284,7 +303,7 @@ describe('Flashcard API', () => {
 
         it("SHOULD NOT PATCH the recallability with a non-existing recallability", (done) => {
             chai.request(app)
-                .patch("/decks/cards/" + cardID2 + "/recallability")
+                .patch("/decks/" + deckID + "/cards/" + cardID2 + "/recallability")
                 .send({
                     "recallability": "medium"
                 })
@@ -302,6 +321,11 @@ describe('Flashcard API', () => {
     describe("Reset DB", () => {
         it("", (done) => {
             Flashcard.deleteMany({_id: [cardID1, cardID2, cardID3]}, function (err) {
+                if (err) {
+                    console.log(err)
+                }
+            });
+            Deck.findByIdAndDelete(deckID, function (err) {
                 if (err) {
                     console.log(err)
                 }

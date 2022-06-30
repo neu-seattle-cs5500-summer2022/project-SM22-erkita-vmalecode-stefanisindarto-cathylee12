@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const deckRoutes = require("./routes/deck.js");
+const cardRoutes = require("./routes/flashcard.js")
 const dotenv = require("dotenv");
 var http = require("http");
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 app.use("/decks", deckRoutes);
+app.use("/decks", cardRoutes);
 
 app.get("/", (req, res) => {
   res.send("Test: App running succesfully");
