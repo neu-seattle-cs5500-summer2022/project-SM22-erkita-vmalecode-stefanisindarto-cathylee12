@@ -3,14 +3,14 @@ const flashcardController = require("../controllers/flashcard.js");
 
 const flashcardRouter = express.Router();
 
-flashcardRouter.post("/", flashcardController.createCard);
-flashcardRouter.get("/:id", flashcardController.getCard);
-flashcardRouter.get("/", flashcardController.getCards);
-flashcardRouter.get("/:id/front", flashcardController.getFront);
-flashcardRouter.get("/:id/back", flashcardController.getBack);
-flashcardRouter.delete("/:id", flashcardController.deleteCard);
-flashcardRouter.patch("/:id/front", flashcardController.updateFront);
-flashcardRouter.patch("/:id/back", flashcardController.updateBack);
-flashcardRouter.patch("/:id/recallability", flashcardController.updateRecallability);
+flashcardRouter.post("/:deckId/cards", flashcardController.createCard);
+flashcardRouter.get("/:deckId/cards/:id", flashcardController.getCard);
+flashcardRouter.get("/:deckId/cards", flashcardController.getCards);
+flashcardRouter.get("/:deckId/cards/:id/front", flashcardController.getFront);
+flashcardRouter.get("/:deckId/cards/:id/back", flashcardController.getBack);
+flashcardRouter.delete("/:deckId/cards/:id", flashcardController.deleteCard);
+flashcardRouter.patch("/:deckId/cards/:id/front", flashcardController.updateFront);
+flashcardRouter.patch("/:deckId/cards/:id/back", flashcardController.updateBack);
+flashcardRouter.patch("/:deckId/cards/:id/recallability", flashcardController.updateRecallability);
 
 module.exports = flashcardRouter;
