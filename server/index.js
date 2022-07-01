@@ -14,8 +14,8 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
-app.use("/decks", deckRoutes);
-app.use("/decks", cardRoutes);
+app.use("/api/decks", deckRoutes);
+app.use("/api/decks", cardRoutes);
 
 app.get("/", (req, res) => {
   res.send("Test: App running succesfully");
@@ -24,6 +24,7 @@ app.get("/", (req, res) => {
 const mongoEndpoint = process.env.mongoEndpoint;
 const PORT = process.env.PORT || 8000;
 
+/*
 mongoose
   .connect(mongoEndpoint)
   .then(() =>
@@ -32,6 +33,7 @@ mongoose
     )
   )
   .catch((error) => console.log(error.message));
+  */
 
 mongoose.Promise = global.Promise;
 
