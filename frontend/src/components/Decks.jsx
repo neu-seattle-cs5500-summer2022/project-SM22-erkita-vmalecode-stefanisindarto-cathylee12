@@ -18,11 +18,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
-
+import Backdrop from '@mui/material/Backdrop';
+import DetailDeck from './DetailDeck';
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -162,7 +162,9 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
 
+  
   return (
+    
     <Toolbar
       sx={{
         pl: { sm: 2 },
@@ -173,6 +175,7 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
+      
       {numSelected > 99999 ? (
         <Typography
           sx={{ flex: '1 1 100%' }}
@@ -192,20 +195,6 @@ const EnhancedTableToolbar = (props) => {
           Amgi Decks
         </Typography>
       )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 };
@@ -221,7 +210,16 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const [open, setOpen] = React.useState(false);
+  const [selectedDeck, setSelectedDeck] = React.useState(null);
+  const closeBackdrop = () => {
+    setOpen(false);
+  };
+  const openDetailView = (e) => {
+    setSelectedDeck(e);
+    console.log(e);
+    setOpen(true);
+  };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -285,7 +283,14 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
-      <Paper sx={{ width: '50%', mb: 2 }} >
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={closeBackdrop}
+      >
+        {open? (<DetailDeck deck={selectedDeck} />):(<></>)}
+      </Backdrop>
+      <Paper sx={{ width: {sm:'100%',md:'50%'}, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer >
           <Table
@@ -321,7 +326,7 @@ export default function EnhancedTable() {
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
                           <Button>Practice</Button>
-                          <Button>View</Button>
+                          <Button onClick={() => openDetailView(row)}>Details</Button>
                           <Button>Edit</Button>
                         </ButtonGroup>
                       </TableCell>
@@ -366,6 +371,7 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
+      
     </Box>
   );
 }

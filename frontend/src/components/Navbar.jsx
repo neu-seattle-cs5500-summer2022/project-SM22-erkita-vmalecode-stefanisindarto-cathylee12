@@ -94,7 +94,7 @@ const ResponsiveAppBar = () => {
 
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <PsychologyIcon sx={{ display: { md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -111,7 +111,7 @@ const ResponsiveAppBar = () => {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            Amgi
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
