@@ -3,6 +3,7 @@ import Register from './components/Register';
 import Navbar from "./components/Navbar";
 import SignIn from "./components/SignIn";
 import Decks from "./components/Decks";
+import DetailDeck from './components/DetailDeck';
 function App() {
   return (
     <>
@@ -12,6 +13,7 @@ function App() {
         <Route path = '/login' element = {<SignIn/>}/>
         <Route path = '/register' element = {<Register/>} />
         <Route path = '/view-decks' element = {<Decks/>} />
+        <Route path = '/edit-deck/:deckid' element = {<DetailDeck />} />
         
         {/* <Route path = '/addmovie' element = {<AddMovie/>} />
         <Route path = '/login' element = {<Login/>} />

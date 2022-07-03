@@ -94,7 +94,6 @@ const ResponsiveAppBar = () => {
 
             </Menu>
           </Box>
-          <PsychologyIcon sx={{ display: { md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap

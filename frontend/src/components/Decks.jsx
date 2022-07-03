@@ -22,7 +22,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
-import DetailDeck from './DetailDeck';
+import DeckPopUp from './DeckPopUp';
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -288,7 +288,7 @@ export default function EnhancedTable() {
         open={open}
         onClick={closeBackdrop}
       >
-        {open? (<DetailDeck deck={selectedDeck} />):(<></>)}
+        {open? (<DeckPopUp deck={selectedDeck} />):(<></>)}
       </Backdrop>
       <Paper sx={{ width: {sm:'100%',md:'50%'}, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
