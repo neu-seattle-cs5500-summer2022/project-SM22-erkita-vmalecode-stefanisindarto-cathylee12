@@ -23,6 +23,8 @@ import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
+import { useParams } from 'react-router-dom'
+
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -84,13 +86,13 @@ const headCells = [
     id: 'name',
     numeric: false,
     disablePadding: true,
-    label: 'Deck Name',
+    label: 'Front of Card',
   },
   {
     id: 'cardCount',
     numeric: true,
     disablePadding: false,
-    label: 'Number of Cards',
+    label: 'Back of Card',
   },
   {
     id: 'learning',
@@ -161,10 +163,11 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
+  const params = useParams()
+  const deckID = params.deckid
 
-  
   return (
-    
+
     <Toolbar
       sx={{
         pl: { sm: 2 },
@@ -175,7 +178,7 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
-      
+
       {numSelected > 99999 ? (
         <Typography
           sx={{ flex: '1 1 100%' }}
@@ -192,7 +195,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Amgi Decks
+          Amgi Deck: {deckID}
         </Typography>
       )}
     </Toolbar>
@@ -212,6 +215,8 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+
+
   const closeBackdrop = () => {
     setOpen(false);
   };
@@ -288,9 +293,9 @@ export default function EnhancedTable() {
         open={open}
         onClick={closeBackdrop}
       >
-        {open? (<DeckPopUp deck={selectedDeck} />):(<></>)}
+        {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
-      <Paper sx={{ width: {sm:'100%',md:'50%'}, mb: 2 }} >
+      <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer >
           <Table
@@ -325,9 +330,8 @@ export default function EnhancedTable() {
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button>Practice</Button>
-                          <Button onClick={() => openDetailView(row)}>Details</Button>
-                          <Button>Edit</Button>
+                          <Button>Delete</Button>
+                          <Button onClick={() => openDetailView(row)}>Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
@@ -371,7 +375,7 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      
+
     </Box>
   );
 }
