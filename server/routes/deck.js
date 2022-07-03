@@ -14,7 +14,6 @@ router.delete("/:id", deckController.deleteDeck);
 // router.post("/", authentication, deckController.createDeck);
 // router.get("/", authentication, deckController.getDecks);
 // router.get("/:id", authentication, deckController.getDeck);
-// router.post("/", authentication, deckController.createDeck);
 // router.patch("/:id", authentication, deckController.updateDeckName);
 // router.delete("/:id", authentication, deckController.deleteDeck);
 
