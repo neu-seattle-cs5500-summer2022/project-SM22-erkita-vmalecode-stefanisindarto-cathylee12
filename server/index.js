@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const deckRoutes = require("./routes/deck.js");
-const cardRoutes = require("./routes/flashcard.js")
+const cardRoutes = require("./routes/flashcard.js");
 const userRouter = require("./routes/user.js");
 const dotenv = require("dotenv");
 var http = require("http");
@@ -17,7 +17,7 @@ app.use(cors());
 
 app.use("/api/decks", deckRoutes);
 app.use("/api/decks", cardRoutes);
-app.use('/api', userRouter);
+app.use("/api/", userRouter);
 
 app.get("/", (req, res) => {
   res.send("Test: App running succesfully");
