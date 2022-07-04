@@ -1,13 +1,15 @@
+const { ObjectId } = require("bson");
 const mongoose = require("mongoose");
 
 const flashcardSchema = mongoose.Schema({
+  deckId: { type: ObjectId },
   front: {
     type: String,
-    required: true 
+    required: true,
   },
   back: {
     type: String,
-    required: true 
+    required: true,
   },
   recallability: {
     type: String,

@@ -1,5 +1,5 @@
-// import flashcard from "./flashcard";
 const mongoose = require("mongoose");
+const { Flashcard } = require("./flashcard.js");
 
 const deckSchema = mongoose.Schema({
   userId: { type: String },
@@ -7,8 +7,7 @@ const deckSchema = mongoose.Schema({
   recallabilityPercentage: { type: Number, min: 0, max: 100, default: 0 },
   lastReviewed: { type: Date, default: Date.now },
   dateCreated: { type: Date, default: new Date() },
-  //   flashcards: [flashcard],
+  cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Flashcard" }],
 });
 
-// export default mongoose.model("DeckSchema", deckSchema);
 module.exports = mongoose.model("DeckSchema", deckSchema);
