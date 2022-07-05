@@ -20,6 +20,11 @@ import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
 import { IoMdAddCircle } from 'react-icons/io'
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import {getDecks,reset} from '../features/dataSlice';
+
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -31,11 +36,11 @@ function createData(name, calories, fat, carbs, protein) {
   };
 }
 
-const rows = [
+let rows = [
+  createData('CS asdfasfd5500', 159, 6.0, 24, 4.0),
   createData('Words', 305, 3.7, 67, 4.3),
   createData('Python', 452, 25.0, 51, 4.9),
   createData('Java', 262, 16.0, 24, 6.0),
-  createData('CS 5500', 159, 6.0, 24, 4.0),
   createData('Gingerbread', 356, 16.0, 49, 3.9),
   createData('Bees', 408, 3.2, 87, 6.5),
   createData('Ice cream sandwichs', 237, 9.0, 37, 4.3),
@@ -91,22 +96,10 @@ const headCells = [
     label: 'Number of Cards',
   },
   {
-    id: 'learning',
+    id: 'createdOn',
     numeric: true,
     disablePadding: false,
-    label: 'Learning',
-  },
-  {
-    id: 'memorized',
-    numeric: true,
-    disablePadding: false,
-    label: 'Memorized',
-  },
-  {
-    id: 'createdDate',
-    numeric: true,
-    disablePadding: false,
-    label: 'Created on',
+    label: 'Created On',
   },
 ];
 
@@ -210,6 +203,18 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth);
+  const decks = useSelector((state) => state.data.decks);
+  useEffect(()=> {
+    if (!user) {
+      navigate('/login');
+    }
+    dispatch(getDecks())
+    
+  },[navigate]);
+
   const closeBackdrop = () => {
     setOpen(false);
   };
@@ -217,6 +222,10 @@ export default function EnhancedTable() {
     setSelectedDeck(e);
     console.log(e);
     setOpen(true);
+  };
+  const handleEdit = (e) => {
+    console.log(e._id);
+    navigate('/edit-deck/'+e._id);
   };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -264,7 +273,7 @@ export default function EnhancedTable() {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+  rows = decks;
   return (
 
     <Box sx={{
@@ -313,13 +322,13 @@ export default function EnhancedTable() {
                       onClick={(event) => handleClick(event, row.name)}
 
                       tabIndex={-1}
-                      key={row.name}
+                      key={row._id}
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
                           <Button>Practice</Button>
                           <Button onClick={() => openDetailView(row)}>Details</Button>
-                          <Button>Edit</Button>
+                          <Button onClick={() => handleEdit(row)} >Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
@@ -330,10 +339,8 @@ export default function EnhancedTable() {
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+                      <TableCell align="right">{row.cards.length}</TableCell>
+                      <TableCell align="right">{new Date(row.dateCreated).toLocaleString('en-US')}</TableCell>
                     </TableRow>
                   );
                 })}

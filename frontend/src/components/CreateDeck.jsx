@@ -5,10 +5,23 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-const CreateDeck = () => {
-  const handleSubmit = () => {
+import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import {createDeck} from '../features/dataSlice';
 
-  }
+
+const CreateDeck = () => {
+  const dispatch = useDispatch();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const newDeckName = data.get('deck');
+    console.log('[handleSubmit]',newDeckName);
+    dispatch(createDeck(newDeckName));
+    const newDeckData = {
+    
+    };
+  };
   return (
       <>
       <Box
@@ -28,9 +41,9 @@ const CreateDeck = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
+              id="d"
               label="New Deck Name"
-              name="email"
+              name="deck"
               autoComplete="email"
               autoFocus
             />
