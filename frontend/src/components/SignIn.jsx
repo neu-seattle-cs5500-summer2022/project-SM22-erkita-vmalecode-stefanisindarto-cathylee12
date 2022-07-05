@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -13,7 +12,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as Linkto, useNavigate } from 'react-router-dom'
-
+import { login,reset } from '../features/authSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -26,21 +29,51 @@ function Copyright(props) {
     </Typography>
   );
 }
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const theme = createTheme();
 
 export default function SignIn() {
+  const [open, setOpen] = React.useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email');
+    const password = data.get('password');
+    const userData = {email,password};
+    const lg = dispatch(login(userData));
   };
+  const handleClose = (e) => {
+    setOpen(false);
+    dispatch(reset());
+  }
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+  useEffect(() => {
+    if (isError) {
+      setOpen(true);
+    }
 
+    if (isSuccess || user) {
+      dispatch(reset());
+      navigate('/')
+    }
+    
+    
+  }, [user, isError, isSuccess, message, navigate, dispatch])
+  
   return (
     <ThemeProvider theme={theme}>
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
