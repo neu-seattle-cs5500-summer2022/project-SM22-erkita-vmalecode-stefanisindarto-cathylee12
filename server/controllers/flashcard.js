@@ -11,6 +11,7 @@ async function createCard(req, res) {
   try {
     await newCard.save();
     res.status(201).json(newCard);
+    return newCard._id;
   } catch (err) {
     res.status(409).json({ message: err.message });
   }
@@ -29,9 +30,20 @@ async function getCard(req, res) {
 async function getCards(req, res) {
   try {
     const deckId = req.params.id;
-    console.log(deckId);
     const cards = await Flashcard.find({}, { deckId: deckId });
     res.status(200).json(cards);
+    return cards;
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+}
+
+async function getCardRecallability(req, res) {
+  const { id } = req.params;
+  try {
+    const card = await Flashcard.findById(id);
+    res.status(200).json(card.recallabiclity);
+    return card.recallabiclity;
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -107,6 +119,7 @@ module.exports = {
   createCard,
   getCard,
   getCards,
+  getCardRecallability,
   getFront,
   getBack,
   deleteCard,
