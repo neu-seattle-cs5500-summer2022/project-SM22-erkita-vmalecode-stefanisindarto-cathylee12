@@ -17,13 +17,13 @@ app.use(cors());
 
 app.use("/api/decks", deckRoutes);
 app.use("/api/decks", cardRoutes);
-app.use("/api/", userRouter);
+app.use("/api", userRouter);
 
 app.get("/", (req, res) => {
   res.send("Test: App running succesfully");
 });
 
-const mongoEndpoint = process.env.mongoEndpoint;
+const mongoEndpoint = process.env.MONGOENDPOINT;
 const PORT = process.env.PORT || 8000;
 
 /*
@@ -44,7 +44,7 @@ mongoose
   .then(() =>
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
   )
-  .catch((error) => console.log("this is error"));
+  .catch((error) => console.log(error));
 
 // var server = http.createServer(app);
 // server.listen(1337, function () {

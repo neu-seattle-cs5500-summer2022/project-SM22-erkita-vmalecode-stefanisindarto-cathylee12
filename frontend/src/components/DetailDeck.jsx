@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,17 +12,14 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -59,14 +55,12 @@ function descendingComparator(a, b, orderBy) {
     return 1;
   }
   return 0;
-}
-
+};
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
+};
 // This method is created for cross-browser compatibility, if you don't
 // need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
@@ -79,8 +73,7 @@ function stableSort(array, comparator) {
     return a[1] - b[1];
   });
   return stabilizedThis.map((el) => el[0]);
-}
-
+};
 const headCells = [
   {
     id: 'name',
@@ -165,6 +158,7 @@ const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
   const params = useParams()
   const deckID = params.deckid
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
 
   return (
 
@@ -195,7 +189,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Amgi Deck: {deckID}
+          Amgi Deck: <em>{deck.name}</em>
         </Typography>
       )}
     </Toolbar>

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -12,7 +11,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as Linkto, useNavigate } from 'react-router-dom'
+import { Link as Linkto } from 'react-router-dom'
+import { register, reset } from '../features/authSlice'
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import { useSelector, useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Copyright(props) {
   return (
@@ -28,19 +33,61 @@ function Copyright(props) {
 }
 
 const theme = createTheme();
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default function Register() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const [open, setOpen] = React.useState(false);
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    const email = data.get('email');
+    const password = data.get('password');
+    const password2 = data.get('password2');
+    const firstName = data.get('firstName');
+    const lastName = data.get('lastName');
 
+    if (password !== password2) {
+      setOpen(true);
+      return
+    } 
+    const userData = {
+      email,
+      password,
+      firstName,
+      lastName
+    };
+    dispatch(register(userData));
+    
+
+  };
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
+  useEffect(() => {
+    if (isError) {
+      
+    }
+
+    if (isSuccess || user) {
+      navigate('/')
+    }
+
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, navigate, dispatch])
+  const handleClose = (e) => {
+    setOpen(false);
+  }
   return (
     <ThemeProvider theme={theme}>
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          Passwords do not match
+        </Alert>
+      </Snackbar>
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
@@ -62,7 +109,7 @@ export default function Register() {
                 <TextField
                   autoComplete="given-name"
                   name="firstName"
-                  required
+                  // required
                   fullWidth
                   id="firstName"
                   label="First Name"
@@ -71,7 +118,7 @@ export default function Register() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  required
+                  // required
                   fullWidth
                   id="lastName"
                   label="Last Name"
@@ -104,10 +151,10 @@ export default function Register() {
                 <TextField
                   required
                   fullWidth
-                  name="password"
+                  name="password2"
                   label="Confirm Password"
                   type="password"
-                  id="password2"
+                  id="password"
                   autoComplete="new-password"
                 />
               </Grid>
@@ -140,5 +187,6 @@ export default function Register() {
         <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
+
   );
 }

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,16 +12,20 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
+import { IoMdAddCircle } from 'react-icons/io'
+import { Link } from 'react-router-dom';
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import {getDecks,reset} from '../features/dataSlice';
+
+
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -33,11 +36,11 @@ function createData(name, calories, fat, carbs, protein) {
   };
 }
 
-const rows = [
+let rows = [
+  createData('CS asdfasfd5500', 159, 6.0, 24, 4.0),
   createData('Words', 305, 3.7, 67, 4.3),
   createData('Python', 452, 25.0, 51, 4.9),
   createData('Java', 262, 16.0, 24, 6.0),
-  createData('CS 5500', 159, 6.0, 24, 4.0),
   createData('Gingerbread', 356, 16.0, 49, 3.9),
   createData('Bees', 408, 3.2, 87, 6.5),
   createData('Ice cream sandwichs', 237, 9.0, 37, 4.3),
@@ -93,22 +96,10 @@ const headCells = [
     label: 'Number of Cards',
   },
   {
-    id: 'learning',
+    id: 'createdOn',
     numeric: true,
     disablePadding: false,
-    label: 'Learning',
-  },
-  {
-    id: 'memorized',
-    numeric: true,
-    disablePadding: false,
-    label: 'Memorized',
-  },
-  {
-    id: 'createdDate',
-    numeric: true,
-    disablePadding: false,
-    label: 'Created on',
+    label: 'Created On',
   },
 ];
 
@@ -162,9 +153,9 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
 
-  
+
   return (
-    
+
     <Toolbar
       sx={{
         pl: { sm: 2 },
@@ -175,7 +166,7 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
-      
+
       {numSelected > 99999 ? (
         <Typography
           sx={{ flex: '1 1 100%' }}
@@ -212,6 +203,18 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth);
+  const decks = useSelector((state) => state.data.decks);
+  useEffect(()=> {
+    if (!user) {
+      navigate('/login');
+    }
+    dispatch(getDecks())
+    
+  },[navigate]);
+
   const closeBackdrop = () => {
     setOpen(false);
   };
@@ -220,12 +223,15 @@ export default function EnhancedTable() {
     console.log(e);
     setOpen(true);
   };
+  const handleEdit = (e) => {
+    console.log(e._id);
+    navigate('/edit-deck/'+e._id);
+  };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = rows.map((n) => n.name);
@@ -234,7 +240,6 @@ export default function EnhancedTable() {
     }
     setSelected([]);
   };
-
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -254,26 +259,21 @@ export default function EnhancedTable() {
 
     setSelected(newSelected);
   };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+  rows = decks;
   return (
 
     <Box sx={{
@@ -283,14 +283,15 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
+      <Button component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
         onClick={closeBackdrop}
       >
-        {open? (<DeckPopUp deck={selectedDeck} />):(<></>)}
+        {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
-      <Paper sx={{ width: {sm:'100%',md:'50%'}, mb: 2 }} >
+      <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer >
           <Table
@@ -321,13 +322,13 @@ export default function EnhancedTable() {
                       onClick={(event) => handleClick(event, row.name)}
 
                       tabIndex={-1}
-                      key={row.name}
+                      key={row._id}
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
                           <Button>Practice</Button>
                           <Button onClick={() => openDetailView(row)}>Details</Button>
-                          <Button>Edit</Button>
+                          <Button onClick={() => handleEdit(row)} >Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
@@ -338,10 +339,8 @@ export default function EnhancedTable() {
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+                      <TableCell align="right">{row.cards.length}</TableCell>
+                      <TableCell align="right">{new Date(row.dateCreated).toLocaleString('en-US')}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -371,7 +370,7 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      
+
     </Box>
   );
 }
