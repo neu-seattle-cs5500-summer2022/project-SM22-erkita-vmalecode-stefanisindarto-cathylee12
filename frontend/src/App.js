@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import SignIn from "./components/SignIn";
 import Decks from "./components/Decks";
 import DetailDeck from './components/DetailDeck';
+import Flashcard from './components/Flashcard';
 import CreateDeck from './components/CreateDeck';
 import React from 'react';
 function App() {
@@ -17,11 +18,8 @@ function App() {
         <Route path = '/register' element = {<Register/>} />
         <Route path = '/view-decks' element = {<Decks/>} />
         <Route path = '/edit-deck/:deckid' element = {<DetailDeck />} />
+        <Route path = '/cards' element = {<Flashcard/>} />
         <Route path = '/create-deck' element = {<CreateDeck />} />
-        {/* <Route path = '/addmovie' element = {<AddMovie/>} />
-        <Route path = '/login' element = {<Login/>} />
-        <Route path = '/register' element = {<Register/>} />
-        <Route path = '/moviedetail/:id' element = {<MovieDetail/>} /> */}
       </Routes>
     </Router>
     
