@@ -12,6 +12,7 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        <Route path = '/' element = {<></>}/>
         <Route path = '/login' element = {<SignIn/>}/>
         <Route path = '/register' element = {<Register/>} />
         <Route path = '/view-decks' element = {<Decks/>} />

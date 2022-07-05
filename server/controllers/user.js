@@ -25,7 +25,7 @@ async function login(req, res) {
     const token = jwt.sign(
       { email: existingUser.email, id: existingUser._id },
       process.env.SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "30d" }
     );
 
     res.status(200).json({ result: existingUser, token });
@@ -64,7 +64,7 @@ const signup = async(req, res) => {
     });
 
 
-        const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "1h"});
+        const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "30d"});
 
         res.status(200).json({result, token})
     } catch (error) {
