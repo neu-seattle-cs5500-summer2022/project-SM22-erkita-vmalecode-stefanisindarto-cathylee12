@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
-const { modelName } = require("../models/deck.js");
 const DeckSchema = require("../models/deck.js");
 const invalidNameMessage = "Valid name required";
+const {
+  createCard,
+  getCards,
+  getCardRecallability,
+} = require("./flashcard.js");
 
 function onlyContainsWhiteSpace(req, res) {
   if (req.body.name.trim().length === 0) {
@@ -33,7 +37,7 @@ async function createDeck(req, res) {
     try {
       const newDeck = new DeckSchema({
         name: req.body.name,
-        // userId: req.userId,
+        userId: req.userId,
         lastReviewed: new Date().now,
         dateCreated: new Date(),
       });
@@ -45,6 +49,10 @@ async function createDeck(req, res) {
   } else {
     res.status(404).json({ message: invalidNameMessage });
   }
+}
+
+async function addFlashcard(req, res) {
+  createCard(req, res);
 }
 
 async function getDeck(req, res) {
@@ -59,11 +67,16 @@ async function getDeck(req, res) {
 
 async function getDecks(req, res) {
   try {
-    const decks = await DeckSchema.find();
+    const userId = req.userId;
+    const decks = await DeckSchema.find({ userId: userId });
     res.status(200).json(decks);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
+}
+
+async function getDeckFlashcards(req, res) {
+  return getCards(req, res);
 }
 
 async function updateDeckName(req, res) {
@@ -92,4 +105,12 @@ async function deleteDeck(req, res) {
   res.json({ message: "Deck deleted" });
 }
 
-module.exports = { createDeck, getDeck, getDecks, updateDeckName, deleteDeck };
+module.exports = {
+  createDeck,
+  addFlashcard,
+  getDeck,
+  getDeckFlashcards,
+  getDecks,
+  updateDeckName,
+  deleteDeck,
+};

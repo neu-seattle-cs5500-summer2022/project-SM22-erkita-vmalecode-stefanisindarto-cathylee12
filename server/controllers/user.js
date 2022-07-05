@@ -1,4 +1,4 @@
-const dotenv = require('dotenv').config();
+const dotenv = require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserSchema = require("../models/user.js");
@@ -8,21 +8,30 @@ const UserSchema = require("../models/user.js");
  checks if the password input match what is stored in database.
  If successful, send the results which are the existing user detail and the user's token.
  */
-const login = async(req, res) => {
-    const { email, password } = req.body;
+async function login(req, res) {
+  const { email, password } = req.body;
 
-    try{
-        const existingUser = await UserSchema.findOne({email});
-        if(!existingUser) return res.status(404).json({message: "User doesn't exist."});
-        const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
-        if(!isPasswordCorrect) return res.status(400).json({message: "Invalid credentials."})
+  try {
+    const existingUser = await UserSchema.findOne({ email });
+    if (!existingUser)
+      return res.status(404).json({ message: "User doesn't exist." });
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid credentials." });
 
-        const token = jwt.sign({email: existingUser.email, id: existingUser.id}, process.env.SECRET, {expiresIn: "1h"});
+    const token = jwt.sign(
+      { email: existingUser.email, id: existingUser._id },
+      process.env.SECRET,
+      { expiresIn: "1h" }
+    );
 
-        res.status(200).json({result:existingUser, token})
-    } catch (error){
-        res.status(500).json({message: "Something went wrong."});
-    }
+    res.status(200).json({ result: existingUser, token });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong." });
+  }
 }
 
 /*
@@ -32,18 +41,28 @@ const login = async(req, res) => {
  If everything match, create a hashed password before storing the user details in database.
  Lastly, returns the user detail along with the user's token.
  */
+
 const signup = async(req, res) => {
     const {email, password, firstName, lastName} = req.body;
     try {
         const existingUser = await UserSchema.findOne({email});
 
-        if(existingUser) return res.status(404).json({message: "User already exists."});
+
+    if (existingUser)
+      return res.status(404).json({ message: "User already exists." });
+
 
         const salt = await bcrypt.genSalt(12);
 
-        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const result = await UserSchema.create({email, password: hashedPassword, name:`${firstName} ${lastName}`})
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const result = await UserSchema.create({
+      email,
+      password: hashedPassword,
+      name: `${firstName} ${lastName}`,
+    });
+
 
         const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "1h"});
 
@@ -53,6 +72,11 @@ const signup = async(req, res) => {
         res.status(500).json({message: "Something went wrong."});
     }
 
+
+    res.status(200).json({ result, token });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong." });
+  }
 }
 
-module.exports = {login, signup}
+module.exports = { login, signup };
