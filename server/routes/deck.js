@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/", authentication, deckController.createDeck);
 router.post("/:id", authentication, deckController.addFlashcard);
 router.get("/", authentication, deckController.getDecks);
-router.get("/:id/flashcards", authentication, deckController.getDeckFlashcards);
+router.get("/:id/cards", authentication, deckController.getDeckFlashcards);
 router.get("/:id", authentication, deckController.getDeck);
 // router.get("/study/:id", deckController.getStudyDeck);
 router.patch("/:id", authentication, deckController.updateDeckName);
