@@ -33,14 +33,11 @@ const login = async(req, res) => {
  Lastly, returns the user detail along with the user's token.
  */
 const signup = async(req, res) => {
-    const {email, password, confirmPassword, firstName, lastName} = req.body;
-
+    const {email, password, firstName, lastName} = req.body;
     try {
         const existingUser = await UserSchema.findOne({email});
 
         if(existingUser) return res.status(404).json({message: "User already exists."});
-
-        if(password != confirmPassword) return res.status(404).json({message: "Password don't match."});
 
         const salt = await bcrypt.genSalt(12);
 
@@ -52,6 +49,7 @@ const signup = async(req, res) => {
 
         res.status(200).json({result, token})
     } catch (error) {
+        console.log("Server Error: ",error);
         res.status(500).json({message: "Something went wrong."});
     }
 

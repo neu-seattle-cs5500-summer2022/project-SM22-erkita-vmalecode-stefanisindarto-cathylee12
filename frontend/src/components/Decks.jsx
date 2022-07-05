@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,16 +12,15 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
+import { IoMdAddCircle } from 'react-icons/io'
+import { Link } from 'react-router-dom';
+
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -162,9 +160,9 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
 
-  
+
   return (
-    
+
     <Toolbar
       sx={{
         pl: { sm: 2 },
@@ -175,7 +173,7 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
-      
+
       {numSelected > 99999 ? (
         <Typography
           sx={{ flex: '1 1 100%' }}
@@ -225,7 +223,6 @@ export default function EnhancedTable() {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = rows.map((n) => n.name);
@@ -234,7 +231,6 @@ export default function EnhancedTable() {
     }
     setSelected([]);
   };
-
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -254,22 +250,17 @@ export default function EnhancedTable() {
 
     setSelected(newSelected);
   };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -283,14 +274,15 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
+      <Button component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
         onClick={closeBackdrop}
       >
-        {open? (<DeckPopUp deck={selectedDeck} />):(<></>)}
+        {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
-      <Paper sx={{ width: {sm:'100%',md:'50%'}, mb: 2 }} >
+      <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer >
           <Table
@@ -371,7 +363,7 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      
+
     </Box>
   );
 }

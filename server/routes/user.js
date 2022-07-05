@@ -10,4 +10,4 @@ userRouter.get('/', (req, res) => {
 userRouter.post("/login", userController.login);
 userRouter.post("/signup", userController.signup);
 
-module.export = userRouter;
+module.exports = userRouter;
