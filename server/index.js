@@ -17,7 +17,7 @@ app.use(cors());
 
 app.use("/api/decks", deckRoutes);
 app.use("/api/decks", cardRoutes);
-app.use("/api/", userRouter);
+app.use("/api", userRouter);
 
 app.get("/", (req, res) => {
   res.send("Test: App running succesfully");

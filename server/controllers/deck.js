@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
-const { modelName } = require("../models/deck.js");
 const DeckSchema = require("../models/deck.js");
 const invalidNameMessage = "Valid name required";
-const { createCard, getCards } = require("./flashcard.js");
+const {
+  createCard,
+  getCards,
+  getCardRecallability,
+} = require("./flashcard.js");
 
 function onlyContainsWhiteSpace(req, res) {
   if (req.body.name.trim().length === 0) {
@@ -57,7 +60,6 @@ async function getDeck(req, res) {
   try {
     const foundDeck = await DeckSchema.findById(id);
     res.status(200).json(foundDeck);
-    return foundDeck;
   } catch (error) {
     res.status(404).json({ message: "Deck with ID " + id + " not found" });
   }
@@ -66,7 +68,6 @@ async function getDeck(req, res) {
 async function getDecks(req, res) {
   try {
     const userId = req.userId;
-    console.log(userId);
     const decks = await DeckSchema.find({ userId: userId });
     res.status(200).json(decks);
   } catch (error) {
@@ -75,7 +76,7 @@ async function getDecks(req, res) {
 }
 
 async function getDeckFlashcards(req, res) {
-  getCards(req, res);
+  return getCards(req, res);
 }
 
 async function updateDeckName(req, res) {
