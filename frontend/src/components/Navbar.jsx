@@ -11,9 +11,10 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import PsychologyIcon from '@mui/icons-material/Psychology';
-import { Link as Linkto, useNavigate } from 'react-router-dom';
+import { Link as Linkto } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout, reset } from '../features/authSlice';
 
 const pages = [{text:'Create New Deck',link:'/create-deck'}, {text:'View Decks',link:'/view-decks'}];
 // const pages = ['create new deck','view decks']
@@ -23,7 +24,8 @@ const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [loggedIn, setloggedIn] = React.useState(false);
-
+  const { user } = useSelector((state) => state.auth)
+  const dispatch = useDispatch();
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -38,7 +40,11 @@ const ResponsiveAppBar = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const handleLogOut = () => {
+    dispatch(logout());
+    dispatch(reset());
 
+  }
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -126,40 +132,10 @@ const ResponsiveAppBar = () => {
             ))}
           </Box>
 
-          {!loggedIn ? <Button color="inherit" component={Linkto} to={'/login'}> Login  </Button> : <></>}
-          {!loggedIn ? <Button color="inherit" component={Linkto} to={'/register'}> Register  </Button> : <></>}
-          {!loggedIn ?
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open menu">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            : <></>}
+          {!user ? <Button color="inherit" component={Linkto} to={'/login'}> Login  </Button> : <></>}
+          {!user ? <Button color="inherit" component={Linkto} to={'/register'}> Register  </Button> : <></>}
+          {user ? <>Welcome, {user.result.name} &nbsp;<Button color="inherit" onClick = {handleLogOut}> Logout  </Button></> : <></>}
+          
         </Toolbar>
       </Container>
     </AppBar>

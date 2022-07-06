@@ -25,7 +25,7 @@ async function login(req, res) {
     const token = jwt.sign(
       { email: existingUser.email, id: existingUser._id },
       process.env.SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "30d" }
     );
 
     res.status(200).json({ result: existingUser, token });
@@ -41,19 +41,19 @@ async function login(req, res) {
  If everything match, create a hashed password before storing the user details in database.
  Lastly, returns the user detail along with the user's token.
  */
-async function signup(req, res) {
-  const { email, password, confirmPassword, firstName, lastName } = req.body;
 
-  try {
-    const existingUser = await UserSchema.findOne({ email });
+const signup = async(req, res) => {
+    const {email, password, firstName, lastName} = req.body;
+    try {
+        const existingUser = await UserSchema.findOne({email});
+
 
     if (existingUser)
       return res.status(404).json({ message: "User already exists." });
 
-    if (password != confirmPassword)
-      return res.status(404).json({ message: "Password don't match." });
 
-    const salt = await bcrypt.genSalt(12);
+        const salt = await bcrypt.genSalt(12);
+
 
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -63,16 +63,15 @@ async function signup(req, res) {
       name: `${firstName} ${lastName}`,
     });
 
-    const token = jwt.sign(
-      { email: result.email, id: result._id },
-      process.env.SECRET,
-      { expiresIn: "1h" }
-    );
 
+        const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "30d"});
+
+        res.status(200).json({result, token})
+    } catch (error) {
+        console.log("Server Error: ",error);
+        res.status(500).json({message: "Something went wrong."});
+    }
     res.status(200).json({ result, token });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong." });
-  }
 }
 
 module.exports = { login, signup };
