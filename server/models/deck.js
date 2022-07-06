@@ -7,7 +7,11 @@ const deckSchema = mongoose.Schema({
   recallabilityPercentage: { type: Number, min: 0, max: 100, default: 0 },
   lastReviewed: { type: Date, default: Date.now },
   dateCreated: { type: Date, default: new Date() },
-  cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Flashcard" }],
+  cards: [{ 
+    front: String,
+    back: String
+  }],
+  
 });
 
 module.exports = mongoose.model("DeckSchema", deckSchema);

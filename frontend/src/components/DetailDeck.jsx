@@ -20,6 +20,8 @@ import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { IoMdAddCircle } from 'react-icons/io'
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -159,7 +161,7 @@ const EnhancedTableToolbar = (props) => {
   const params = useParams()
   const deckID = params.deckid
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
-
+  
   return (
 
     <Toolbar
@@ -172,26 +174,15 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
-
-      {numSelected > 99999 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
         <Typography
           sx={{ flex: '1 1 100%' }}
           variant="h6"
           id="tableTitle"
           component="div"
         >
-          Amgi Deck: <em>{deck.name}</em>
+          <>Amgi Deck: <em>{deck.name}</em></>
         </Typography>
-      )}
+        
     </Toolbar>
   );
 };
@@ -272,6 +263,10 @@ export default function EnhancedTable() {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  
+  const params = useParams();
+  const deckID = params.deckid;
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
 
   return (
 
@@ -282,6 +277,7 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
+      
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -291,6 +287,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
+        <Button component={Link} to={"/create-card/"+deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -364,11 +361,13 @@ export default function EnhancedTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        
       </Paper>
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
+      
 
     </Box>
   );

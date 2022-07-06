@@ -20,6 +20,18 @@ export const createDeck = createAsyncThunk(
     }
   }
 );
+export const addCard = createAsyncThunk(
+  'data/addCard',
+  async (cardData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.addCard(cardData, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 export const getDecks = createAsyncThunk(
   'data/getDecks',
   async (_, thunkAPI) => {
@@ -40,6 +52,16 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(addCard.fulfilled, (state,action) => {
+        state.isSuccess = true;
+        state.isLoading = false;
+        console.log('add card fulfilled',action.payload);
+      })
+      .addCase(addCard.rejected, (state,action) => {
+        state.isSuccess = true;
+        state.message = false;
+        console.log('add card rejected',action.payload);
+      })
       .addCase(createDeck.pending, (state) => {
         state.isLoading = true;
       })

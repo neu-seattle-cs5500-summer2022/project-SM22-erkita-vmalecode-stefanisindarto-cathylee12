@@ -7,6 +7,7 @@ import DetailDeck from './components/DetailDeck';
 import Flashcard from './components/Flashcard';
 import CreateDeck from './components/CreateDeck';
 import React from 'react';
+import CreateCard from './components/CreateCard';
 function App() {
   return (
     <>
@@ -20,6 +21,7 @@ function App() {
         <Route path = '/edit-deck/:deckid' element = {<DetailDeck />} />
         <Route path = '/cards' element = {<Flashcard/>} />
         <Route path = '/create-deck' element = {<CreateDeck />} />
+        <Route path = '/create-card/:deckid' element = {<CreateCard />} />
       </Routes>
     </Router>
     

@@ -4,7 +4,7 @@ const Flashcard = require("../models/flashcard.js");
 
 async function createCard(req, res) {
   const newCard = new Flashcard({
-    deckId: mongoose.Types.ObjectId(req.params.id),
+    
     front: req.body.front,
     back: req.body.back,
   });

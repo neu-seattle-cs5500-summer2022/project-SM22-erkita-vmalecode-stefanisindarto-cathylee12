@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const DeckSchema = require("../models/deck.js");
 const invalidNameMessage = "Valid name required";
+const Flashcard = require("../models/flashcard.js");
+
 const {
   createCard,
   getCards,
@@ -54,7 +56,26 @@ async function createDeck(req, res) {
 async function addFlashcard(req, res) {
   createCard(req, res);
 }
+async function pushFlashcard(req,res) {
+  console.log('[controllers/deck/pushFlashCard]',req.body);
+  try {
+    const newCard = {
+      front: req.body.front,
+      back: req.body.back,
+    };
+    await DeckSchema.findOneAndUpdate({_id:req.body.deckID},{
+      $push: {
+        cards: newCard
+      }
+    });
+    res.status(200).json(newCard);
 
+  } catch (error) {
+    res.status(500).json({ message: "error creating card"});
+    console.log(error);
+  }
+  
+}
 async function getDeck(req, res) {
   const { id } = req.params;
   try {
@@ -113,4 +134,5 @@ module.exports = {
   getDecks,
   updateDeckName,
   deleteDeck,
+  pushFlashcard,
 };
