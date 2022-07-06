@@ -30,7 +30,7 @@ async function getCard(req, res) {
 async function getCards(req, res) {
   try {
     const deckId = req.params.id;
-    const cards = await Flashcard.find({}, { deckId: deckId });
+    const cards = await Flashcard.find({ deckId: deckId });
     res.status(200).json(cards);
     return cards;
   } catch (err) {
