@@ -1,5 +1,5 @@
-import {BrowserRouter as Router, Routes,Route} from 'react-router-dom'
-import Register from './components/Register';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import SignIn from "./components/SignIn";
 import Decks from "./components/Decks";
@@ -24,7 +24,6 @@ function App() {
         <Route path = '/create-card/:deckid' element = {<CreateCard />} />
       </Routes>
     </Router>
-    
     </>
   );
 }
