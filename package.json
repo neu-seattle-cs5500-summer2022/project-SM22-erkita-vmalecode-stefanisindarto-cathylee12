@@ -9,7 +9,7 @@
     "test": "mocha",
     "server": "nodemon server/index.js",
     "db": "mongod --dbpath /usr/local/var/mongodb/ --rest",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --legacy-peer-deps --prefix frontend"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --legacy-peer-deps --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
   "author": "",
