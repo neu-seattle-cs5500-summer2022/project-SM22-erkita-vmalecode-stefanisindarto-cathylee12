@@ -4,8 +4,8 @@ const { authentication } = require("../middleware/authentication.js");
 
 const router = express.Router();
 
-router.post("/push-card", deckController.pushFlashcard);
-router.post("/remove-card",deckController.removeFlashcard);
+router.post("/push-card",authentication, deckController.pushFlashcard);
+router.post("/remove-card",authentication,deckController.removeFlashcard);
 router.post("/", authentication, deckController.createDeck);
 // router.post("/:id", authentication, deckController.addFlashcard);
 router.get("/", authentication, deckController.getDecks);

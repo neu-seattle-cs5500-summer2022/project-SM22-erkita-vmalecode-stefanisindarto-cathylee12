@@ -29,7 +29,6 @@ const removeCard = async(cardData,token) => {
       Authorization: token
     },
   };
-  console.log('[dataService/removeCard]',cardData);
   const response = await axios.post(API_URL +'decks/remove-card', cardData, config);
   return response.data;
 }

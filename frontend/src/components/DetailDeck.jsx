@@ -212,7 +212,6 @@ export default function EnhancedTable() {
       cardID : e._id,
       deckID : deckID
     }
-    console.log('[detailDeck/delete]',cardData);
     dispatch(removeCard(cardData));
   }
   const handleRequestSort = (event, property) => {
@@ -274,9 +273,13 @@ export default function EnhancedTable() {
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
   rows = deck.cards;
   useEffect(()=> {
-    dispatch(getDecks())
+    dispatch(reset());
+    dispatch(getDecks());
     
   },[navigate]);
+  useEffect(()=> {
+    dispatch(reset());    
+  },[deck]);
   return (
 
     <Box sx={{
