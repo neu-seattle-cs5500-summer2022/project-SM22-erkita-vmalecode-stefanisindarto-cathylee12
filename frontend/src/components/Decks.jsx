@@ -231,6 +231,10 @@ export default function EnhancedTable() {
   const handleEdit = (e) => {
     navigate('/edit-deck/'+e._id);
   };
+  
+  const handlePractice = (e) => {
+    navigate('/practice/'+e._id);
+  };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -330,7 +334,7 @@ export default function EnhancedTable() {
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button>Practice</Button>
+                          <Button onClick={() => handlePractice(row)}>Practice</Button>
                           <Button onClick={() => openDetailView(row)}>Delete</Button>
                           <Button onClick={() => handleEdit(row)} >Edit</Button>
                         </ButtonGroup>

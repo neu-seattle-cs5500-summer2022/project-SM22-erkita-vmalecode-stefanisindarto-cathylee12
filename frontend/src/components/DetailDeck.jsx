@@ -202,9 +202,8 @@ export default function EnhancedTable() {
   const closeBackdrop = () => {
     setOpen(false);
   };
-  const openDetailView = (e) => {
-    setSelectedDeck(e);
-    setOpen(true);
+  const handleEdit = (e) => {
+    
   };
   const handleDelete = (e) => {
     
@@ -334,7 +333,7 @@ export default function EnhancedTable() {
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
                           <Button onClick={() => handleDelete(row)}>Delete</Button>
-                          <Button onClick={() => openDetailView(row)}>Edit</Button>
+                          <Button onClick={() => handleEdit(row)}>Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
