@@ -41,6 +41,7 @@ export default function Register() {
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
+  const [eMsg, setEmsg] = React.useState('');
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -51,6 +52,7 @@ export default function Register() {
     const lastName = data.get('lastName');
 
     if (password !== password2) {
+      setEmsg('Passwords do not match');
       setOpen(true);
       return
     } 
@@ -69,23 +71,24 @@ export default function Register() {
   )
   useEffect(() => {
     if (isError) {
-      
+      setEmsg(message);
+      setOpen(true);
     }
 
     if (isSuccess || user) {
       navigate('/')
     }
 
-    dispatch(reset())
   }, [user, isError, isSuccess, message, navigate, dispatch])
   const handleClose = (e) => {
     setOpen(false);
+    dispatch(reset())
   }
   return (
     <ThemeProvider theme={theme}>
       <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-          Passwords do not match
+          {eMsg}
         </Alert>
       </Snackbar>
       <Container component="main" maxWidth="xs">
