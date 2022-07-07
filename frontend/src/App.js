@@ -9,13 +9,15 @@ import CreateDeck from './components/CreateDeck';
 import React from 'react';
 import CreateCard from './components/CreateCard';
 import Practice from "./components/Practice";
+import Landing from "./components/Landing";
+
 function App() {
   return (
     <>
     <Router>
       <Navbar />
       <Routes>
-        <Route path = '/' element = {<></>}/>
+        <Route path = '/' element = {<Landing />}/>
         <Route path = '/login' element = {<SignIn/>}/>
         <Route path = '/register' element = {<Register/>} />
         <Route path = '/view-decks' element = {<Decks/>} />

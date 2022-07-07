@@ -76,7 +76,7 @@ export default function Register() {
     }
 
     if (isSuccess || user) {
-      navigate('/')
+      navigate('/view-decks')
     }
 
   }, [user, isError, isSuccess, message, navigate, dispatch])

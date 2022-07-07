@@ -43,9 +43,9 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
   const handleLogOut = () => {
-    dispatch(logout());
     dispatch(reset());
     dispatch(clear());
+    dispatch(logout());
     navigate('/');
 
   }
