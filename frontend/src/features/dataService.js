@@ -20,8 +20,17 @@ const addCard = async(cardData,token) => {
       Authorization: token
     },
   };
-  console.log('[dataService/AddCard]',API_URL,'decks/pushCard');
   const response = await axios.post(API_URL +'decks/push-card', cardData, config);
+  return response.data;
+}
+const removeCard = async(cardData,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  console.log('[dataService/removeCard]',cardData);
+  const response = await axios.post(API_URL +'decks/remove-card', cardData, config);
   return response.data;
 }
 const getDecks = async(token) => {
@@ -39,5 +48,6 @@ const dataService = {
   createDeck,
   getDecks,
   addCard,
+  removeCard,
 }
 export default dataService;

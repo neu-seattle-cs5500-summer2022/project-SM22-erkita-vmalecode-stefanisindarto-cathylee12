@@ -63,7 +63,6 @@ const signup = async(req, res) => {
       name: `${firstName} ${lastName}`,
     });
 
-
         const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "30d"});
 
         res.status(200).json({result, token})
@@ -71,7 +70,6 @@ const signup = async(req, res) => {
         console.log("Server Error: ",error);
         res.status(500).json({message: "Something went wrong."});
     }
-    res.status(200).json({ result, token });
 }
 
 module.exports = { login, signup };

@@ -18,10 +18,13 @@ import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate,Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { IoMdAddCircle } from 'react-icons/io'
+import Moment from 'moment';
+import {getDecks,reset,removeCard} from '../features/dataSlice';
+import { useState, useEffect } from 'react';
+
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -33,7 +36,7 @@ function createData(name, calories, fat, carbs, protein) {
   };
 }
 
-const rows = [
+let rows = [
   createData('Words', 305, 3.7, 67, 4.3),
   createData('Python', 452, 25.0, 51, 4.9),
   createData('Java', 262, 16.0, 24, 6.0),
@@ -78,34 +81,22 @@ function stableSort(array, comparator) {
 };
 const headCells = [
   {
-    id: 'name',
+    id: 'front',
     numeric: false,
     disablePadding: true,
     label: 'Front of Card',
   },
   {
-    id: 'cardCount',
+    id: 'back',
     numeric: true,
     disablePadding: false,
     label: 'Back of Card',
   },
   {
-    id: 'learning',
+    id: 'date',
     numeric: true,
     disablePadding: false,
-    label: 'Learning',
-  },
-  {
-    id: 'memorized',
-    numeric: true,
-    disablePadding: false,
-    label: 'Memorized',
-  },
-  {
-    id: 'createdDate',
-    numeric: true,
-    disablePadding: false,
-    label: 'Created on',
+    label: 'Date Created',
   },
 ];
 
@@ -161,7 +152,7 @@ const EnhancedTableToolbar = (props) => {
   const params = useParams()
   const deckID = params.deckid
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
-  
+
   return (
 
     <Toolbar
@@ -174,15 +165,15 @@ const EnhancedTableToolbar = (props) => {
         // }),
       }}
     >
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          <>Amgi Deck: <em>{deck.name}</em></>
-        </Typography>
-        
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        <>Amgi Deck: <em>{deck.name}</em></>
+      </Typography>
+
     </Toolbar>
   );
 };
@@ -200,6 +191,12 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+  Moment.locale('en');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.data
+  )
 
 
   const closeBackdrop = () => {
@@ -207,9 +204,17 @@ export default function EnhancedTable() {
   };
   const openDetailView = (e) => {
     setSelectedDeck(e);
-    console.log(e);
     setOpen(true);
   };
+  const handleDelete = (e) => {
+    
+    const cardData  ={
+      cardID : e._id,
+      deckID : deckID
+    }
+    console.log('[detailDeck/delete]',cardData);
+    dispatch(removeCard(cardData));
+  }
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -263,11 +268,15 @@ export default function EnhancedTable() {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-  
+
   const params = useParams();
   const deckID = params.deckid;
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
-
+  rows = deck.cards;
+  useEffect(()=> {
+    dispatch(getDecks())
+    
+  },[navigate]);
   return (
 
     <Box sx={{
@@ -277,7 +286,7 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
-      
+
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -287,7 +296,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
-        <Button component={Link} to={"/create-card/"+deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -317,26 +326,28 @@ export default function EnhancedTable() {
                       onClick={(event) => handleClick(event, row.name)}
 
                       tabIndex={-1}
-                      key={row.name}
+                      key={row._id}
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button>Delete</Button>
+                          <Button onClick={() => handleDelete(row)}>Delete</Button>
                           <Button onClick={() => openDetailView(row)}>Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
                         component="th"
-                        id={labelId}
+                        id={row._id}
                         scope="row"
                         padding="none"
                       >
-                        {row.name}
+                        {row.front}
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+                      <TableCell align="right">{row.back}</TableCell>
+                      <TableCell align="right">
+                        {Moment(row.dateCreated).format('MMM D, YYYY')}
+                      
+                    </TableCell>
+
                     </TableRow>
                   );
                 })}
@@ -361,13 +372,13 @@ export default function EnhancedTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        
+
       </Paper>
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      
+
 
     </Box>
   );

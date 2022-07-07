@@ -9,13 +9,31 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { addCard } from '../features/dataSlice';
 import { useParams } from 'react-router-dom';
+import { reset } from '../features/dataSlice';
+import { useState, useEffect } from 'react';
 
 
 const CreateDeck = () => {
-  const dispatch = useDispatch();
   const params = useParams();
   const deckID = params.deckid;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.data
+  )
+  useEffect(() => {
+    if (isError) {
 
+    }
+
+    if (isSuccess) {
+      dispatch(reset());
+      navigate('/edit-deck/' + deckID);
+    }
+
+
+  }, [isSuccess])
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -24,11 +42,10 @@ const CreateDeck = () => {
     const cardData = {
       deckID,
       front,
-      back
-    }
-    console.log(cardData);
-    dispatch(addCard(cardData));
+      back,
 
+    }
+    dispatch(addCard(cardData));
   };
   return (
     <>
@@ -47,7 +64,7 @@ const CreateDeck = () => {
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             multiline
-            rows = {2}
+            rows={2}
             margin="normal"
             required
             fullWidth
@@ -58,7 +75,7 @@ const CreateDeck = () => {
           />
           <TextField
             multiline
-            rows = {2}
+            rows={2}
             margin="normal"
             required
             fullWidth
