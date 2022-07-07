@@ -8,10 +8,15 @@ import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {createDeck} from '../features/dataSlice';
-
+import { reset } from '../features/dataSlice';
+import { useState, useEffect } from 'react';
 
 const CreateDeck = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.data
+  )
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -22,6 +27,18 @@ const CreateDeck = () => {
     
     };
   };
+  useEffect(() => {
+    if (isError) {
+      
+    }
+
+    if (isSuccess ) {
+      dispatch(reset());
+      navigate('/view-decks');
+    }
+
+    
+  }, [ isSuccess])
   return (
       <>
       <Box

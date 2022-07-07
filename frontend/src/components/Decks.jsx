@@ -24,6 +24,8 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {getDecks,reset} from '../features/dataSlice';
+import Moment from 'moment';
+
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -207,6 +209,7 @@ export default function EnhancedTable() {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth);
   const decks = useSelector((state) => state.data.decks);
+  Moment.locale('en');
   useEffect(()=> {
     if (!user) {
       navigate('/login');
@@ -220,11 +223,9 @@ export default function EnhancedTable() {
   };
   const openDetailView = (e) => {
     setSelectedDeck(e);
-    console.log(e);
     setOpen(true);
   };
   const handleEdit = (e) => {
-    console.log(e._id);
     navigate('/edit-deck/'+e._id);
   };
   const handleRequestSort = (event, property) => {
@@ -305,7 +306,7 @@ export default function EnhancedTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={rows?.length}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -340,7 +341,7 @@ export default function EnhancedTable() {
                         {row.name}
                       </TableCell>
                       <TableCell align="right">{row.cards.length}</TableCell>
-                      <TableCell align="right">{new Date(row.dateCreated).toLocaleString('en-US')}</TableCell>
+                      <TableCell align="right">{Moment(row.dateCreated).format('MMM D, YYYY')}</TableCell>
                     </TableRow>
                   );
                 })}

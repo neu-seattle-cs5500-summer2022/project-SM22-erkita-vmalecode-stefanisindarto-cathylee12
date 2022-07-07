@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = require("bson");
 const { Flashcard } = require("./flashcard.js");
 
 const deckSchema = mongoose.Schema({
@@ -7,7 +8,13 @@ const deckSchema = mongoose.Schema({
   recallabilityPercentage: { type: Number, min: 0, max: 100, default: 0 },
   lastReviewed: { type: Date, default: Date.now },
   dateCreated: { type: Date, default: new Date() },
-  cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Flashcard" }],
+  cards: [{
+    front: String,
+    back: String,
+    dateCreated: { type: Date, default: new Date() },
+    deckId: { type: ObjectId },
+  }],
+  
 });
 
 module.exports = mongoose.model("DeckSchema", deckSchema);
