@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 app.use("/api/decks", deckRoutes);
-app.use("/api/cards", cardRoutes);
+// app.use("/api/cards", cardRoutes);
 app.use("/api", userRouter);
 
 app.get("/", (req, res) => {

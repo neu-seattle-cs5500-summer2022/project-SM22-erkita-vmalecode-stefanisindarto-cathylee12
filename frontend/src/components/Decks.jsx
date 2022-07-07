@@ -217,6 +217,9 @@ export default function EnhancedTable() {
     dispatch(getDecks())
     
   },[navigate]);
+  useEffect(()=> {
+    dispatch(reset());    
+  },[decks]);
 
   const closeBackdrop = () => {
     setOpen(false);
@@ -227,6 +230,10 @@ export default function EnhancedTable() {
   };
   const handleEdit = (e) => {
     navigate('/edit-deck/'+e._id);
+  };
+  
+  const handlePractice = (e) => {
+    navigate('/practice/'+e._id);
   };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -284,7 +291,6 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
-      <Button component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -294,6 +300,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
+        <Button sx={{marginLeft: '20px'}} component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -327,8 +334,8 @@ export default function EnhancedTable() {
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button>Practice</Button>
-                          <Button onClick={() => openDetailView(row)}>Details</Button>
+                          <Button onClick={() => handlePractice(row)}>Practice</Button>
+                          <Button onClick={() => openDetailView(row)}>Delete</Button>
                           <Button onClick={() => handleEdit(row)} >Edit</Button>
                         </ButtonGroup>
                       </TableCell>

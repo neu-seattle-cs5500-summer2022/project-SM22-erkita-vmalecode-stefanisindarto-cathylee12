@@ -14,6 +14,19 @@ const createDeck = async(deckName,token) => {
   const response = await axios.post(API_URL +'decks', deckData, config);
   return response.data;
 }
+const deleteDeck = async(deckID,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const deckData = {
+    deckID: deckID,
+  };
+  console.log('[dataService/deleteDeck]',API_URL +'decks/'+ deckID);
+  const response = await axios.delete(API_URL +'decks/'+ deckID, deckData, config);
+  return response.data;
+}
 const addCard = async(cardData,token) => {
   const config = {
     headers: {
@@ -29,7 +42,6 @@ const removeCard = async(cardData,token) => {
       Authorization: token
     },
   };
-  console.log('[dataService/removeCard]',cardData);
   const response = await axios.post(API_URL +'decks/remove-card', cardData, config);
   return response.data;
 }
@@ -49,5 +61,6 @@ const dataService = {
   getDecks,
   addCard,
   removeCard,
+  deleteDeck
 }
 export default dataService;

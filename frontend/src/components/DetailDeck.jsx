@@ -202,9 +202,8 @@ export default function EnhancedTable() {
   const closeBackdrop = () => {
     setOpen(false);
   };
-  const openDetailView = (e) => {
-    setSelectedDeck(e);
-    setOpen(true);
+  const handleEdit = (e) => {
+    
   };
   const handleDelete = (e) => {
     
@@ -212,7 +211,6 @@ export default function EnhancedTable() {
       cardID : e._id,
       deckID : deckID
     }
-    console.log('[detailDeck/delete]',cardData);
     dispatch(removeCard(cardData));
   }
   const handleRequestSort = (event, property) => {
@@ -274,9 +272,13 @@ export default function EnhancedTable() {
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
   rows = deck.cards;
   useEffect(()=> {
-    dispatch(getDecks())
+    dispatch(reset());
+    dispatch(getDecks());
     
   },[navigate]);
+  useEffect(()=> {
+    dispatch(reset());    
+  },[deck]);
   return (
 
     <Box sx={{
@@ -296,7 +298,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
-        <Button component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button sx={{marginLeft: '20px'}} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -331,7 +333,7 @@ export default function EnhancedTable() {
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
                           <Button onClick={() => handleDelete(row)}>Delete</Button>
-                          <Button onClick={() => openDetailView(row)}>Edit</Button>
+                          <Button onClick={() => handleEdit(row)}>Edit</Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell

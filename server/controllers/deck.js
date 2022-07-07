@@ -55,8 +55,12 @@ async function createDeck(req, res) {
 
 async function removeFlashcard(req,res) {
   try {
+    // Verify authorization:
     let deck = await DeckSchema.findById(req.body.deckID);
-    console.log(deck.cards);
+    if (deck.userId !== req.userId) {
+      res.status(403);
+      return
+    }
     console.log('[deckController/removeFlashcard]',req.body);
     cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
     await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
@@ -65,7 +69,8 @@ async function removeFlashcard(req,res) {
     deck = await DeckSchema.findById(req.body.deckID);
 
     console.log('[deckController/removeFlashcard] remove: deck cards: ',deck.cards);
-    res.status(200).json(req.body.cardID);
+    
+    res.status(200).json(req.body);
 
   } catch (error) {
     res.status(500).json({ message: "error deleting card"});
@@ -73,13 +78,20 @@ async function removeFlashcard(req,res) {
   }
 }
 async function pushFlashcard(req,res) {
+  
   try {
+    // Verify Authorization
+    const deck = await DeckSchema.findById(req.body.deckID)
+    console.log(deck)
+    if (deck.userId !== req.userId) {
+      res.status(403);
+      return
+    }
     const newCard = {
       front: req.body.front,
       back: req.body.back,
       deckId: req.body.deckID
     };
-    console.log(newCard);
     await DeckSchema.findOneAndUpdate({_id:req.body.deckID},{
       $push: {
         cards: newCard
@@ -132,6 +144,7 @@ async function updateDeckName(req, res) {
 }
 
 async function deleteDeck(req, res) {
+  console.log('[deckController/deleteDeck]',req.params)
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
@@ -139,7 +152,7 @@ async function deleteDeck(req, res) {
       .json({ message: "Could not delete deck with invalid ID: " + id });
   }
   await DeckSchema.findByIdAndRemove(id);
-  res.json({ message: "Deck deleted" });
+  res.json({ message: "Deck deleted",deckID:id });
 }
 
 module.exports = {
