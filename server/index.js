@@ -26,18 +26,19 @@ app.get("/", (req, res) => {
 const mongoEndpoint = process.env.MONGOENDPOINT;
 const PORT = process.env.PORT || 8000;
 
-/*
-mongoose
-  .connect(mongoEndpoint)
-  .then(() =>
-    app.listen(constants.PORT, () =>
-      console.log(`Server Running on Port ${constants.PORT}`)
+mongoose.Promise = global.Promise;
+// serve the frontend
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
+
+  app.get('*', (req, res) =>
+    res.sendFile(
+      path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
     )
   )
-  .catch((error) => console.log(error.message));
-  */
-
-mongoose.Promise = global.Promise;
+} else {
+  app.get('/', (req, res) => res.send('Environment must be set to production!'))
+}
 
 mongoose
   .connect(mongoEndpoint)
@@ -45,10 +46,5 @@ mongoose
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
   )
   .catch((error) => console.log(error));
-
-// var server = http.createServer(app);
-// server.listen(1337, function () {
-//   console.log("Node server running on http://localhost:1337");
-// });
 
 module.exports = app;
