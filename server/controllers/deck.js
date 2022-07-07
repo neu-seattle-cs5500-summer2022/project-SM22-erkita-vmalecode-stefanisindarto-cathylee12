@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const DeckSchema = require("../models/deck.js");
 const invalidNameMessage = "Valid name required";
+const Flashcard = require("../models/flashcard.js");
+
 const {
   createCard,
   getCards,
@@ -51,10 +53,45 @@ async function createDeck(req, res) {
   }
 }
 
-async function addFlashcard(req, res) {
-  createCard(req, res);
-}
+async function removeFlashcard(req,res) {
+  try {
+    let deck = await DeckSchema.findById(req.body.deckID);
+    console.log(deck.cards);
+    console.log('[deckController/removeFlashcard]',req.body);
+    cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
+    await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
+      $pull: { cards: {_id: req.body.cardID} }
+    }).exec();
+    deck = await DeckSchema.findById(req.body.deckID);
 
+    console.log('[deckController/removeFlashcard] remove: deck cards: ',deck.cards);
+    res.status(200).json(req.body.cardID);
+
+  } catch (error) {
+    res.status(500).json({ message: "error deleting card"});
+    console.log(error);
+  }
+}
+async function pushFlashcard(req,res) {
+  try {
+    const newCard = {
+      front: req.body.front,
+      back: req.body.back,
+      deckId: req.body.deckID
+    };
+    console.log(newCard);
+    await DeckSchema.findOneAndUpdate({_id:req.body.deckID},{
+      $push: {
+        cards: newCard
+      }
+    });
+    res.status(200).json(newCard);
+
+  } catch (error) {
+    res.status(500).json({ message: "error creating card"});
+    console.log(error);
+  }
+}
 async function getDeck(req, res) {
   const { id } = req.params;
   try {
@@ -107,10 +144,11 @@ async function deleteDeck(req, res) {
 
 module.exports = {
   createDeck,
-  addFlashcard,
   getDeck,
   getDeckFlashcards,
   getDecks,
   updateDeckName,
   deleteDeck,
+  pushFlashcard,
+  removeFlashcard,
 };
