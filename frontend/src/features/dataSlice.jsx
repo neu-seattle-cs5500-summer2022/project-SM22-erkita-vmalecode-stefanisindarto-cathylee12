@@ -20,6 +20,18 @@ export const createDeck = createAsyncThunk(
     }
   }
 );
+export const deleteDeck = createAsyncThunk(
+  'data/delete',
+  async (deckData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.deleteDeck(deckData, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 export const addCard = createAsyncThunk(
   'data/addCard',
   async (cardData, thunkAPI) => {
@@ -76,6 +88,12 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(deleteDeck.fulfilled, (state,action) => {
+        state.isSuccess = true;
+        console.log('[case deletedeck.fulfilled]',action.payload);
+        const deckIdx = getIdx(state.decks,action.payload.deckID);
+        state.decks.splice(deckIdx,1);
+      })
       .addCase(removeCard.fulfilled, (state,action) => {
         state.isSuccess = true;
         const deckIdx = getIdx(state.decks,action.payload.deckID);

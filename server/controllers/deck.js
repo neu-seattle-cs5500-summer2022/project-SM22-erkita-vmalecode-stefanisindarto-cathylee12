@@ -144,6 +144,7 @@ async function updateDeckName(req, res) {
 }
 
 async function deleteDeck(req, res) {
+  console.log('[deckController/deleteDeck]',req.params)
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
@@ -151,7 +152,7 @@ async function deleteDeck(req, res) {
       .json({ message: "Could not delete deck with invalid ID: " + id });
   }
   await DeckSchema.findByIdAndRemove(id);
-  res.json({ message: "Deck deleted" });
+  res.json({ message: "Deck deleted",deckID:id });
 }
 
 module.exports = {

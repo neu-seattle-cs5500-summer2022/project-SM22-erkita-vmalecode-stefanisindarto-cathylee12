@@ -7,8 +7,9 @@ permission to access and update decks and flashcards.
 */
 async function authentication(req, res, next) {
   try {
+    console.log('[Authentication]')
     const token = req.headers.authorization;
-    const isCustomAuth = token.length < 500;
+    const isCustomAuth = true;
 
     let decodedData;
     const SECRET = process.env.SECRET;

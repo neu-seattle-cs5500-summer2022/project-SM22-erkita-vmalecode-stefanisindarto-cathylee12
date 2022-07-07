@@ -299,7 +299,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
-        <Button component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button sx={{marginLeft: '20px'}} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
