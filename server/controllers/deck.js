@@ -144,8 +144,12 @@ async function updateDeckName(req, res) {
 }
 
 async function deleteDeck(req, res) {
-  console.log('[deckController/deleteDeck]',req.params)
   const { id } = req.params;
+  const deck = await DeckSchema.findById(id);
+  // Check authorization
+  if (deck.userId !== req.userId) {
+    return res.status(403);
+  }
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(404)
