@@ -85,6 +85,7 @@ export const dataSlice = createSlice({
       state.isError = false
       state.message = ''
     },
+    clear: (state) => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -129,3 +130,4 @@ export const dataSlice = createSlice({
 });
 export default dataSlice.reducer;
 export const { reset } = dataSlice.actions
+export const { clear } = dataSlice.actions
