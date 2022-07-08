@@ -14,9 +14,10 @@ import MenuItem from '@mui/material/MenuItem';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import { Link as Linkto } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, reset } from '../features/authSlice';
-
-const pages = [{text:'Create New Deck',link:'/create-deck'}, {text:'View Decks',link:'/view-decks'}];
+import { logout,reset } from '../features/authSlice';
+import { clear } from '../features/dataSlice';
+import { useNavigate } from 'react-router-dom';
+const pages = [{ text: 'Create New Deck', link: '/create-deck' }, { text: 'View Decks', link: '/view-decks' }];
 // const pages = ['create new deck','view decks']
 const settings = ['Profile', 'Logout'];
 
@@ -26,6 +27,7 @@ const ResponsiveAppBar = () => {
   const [loggedIn, setloggedIn] = React.useState(false);
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -41,8 +43,10 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
   const handleLogOut = () => {
-    dispatch(logout());
     dispatch(reset());
+    dispatch(clear());
+    dispatch(logout());
+    navigate('/');
 
   }
   return (
@@ -121,7 +125,7 @@ const ResponsiveAppBar = () => {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
-                component={Linkto} 
+                component={Linkto}
                 to={page.link}
                 key={page.link}
                 onClick={handleCloseNavMenu}
@@ -134,8 +138,8 @@ const ResponsiveAppBar = () => {
 
           {!user ? <Button color="inherit" component={Linkto} to={'/login'}> Login  </Button> : <></>}
           {!user ? <Button color="inherit" component={Linkto} to={'/register'}> Register  </Button> : <></>}
-          {user ? <>Welcome, {user.result.name} &nbsp;<Button color="inherit" onClick = {handleLogOut}> Logout  </Button></> : <></>}
-          
+          {user ? <>Welcome, {user.result.name} &nbsp;<Button color="inherit" onClick={handleLogOut}> Logout  </Button></> : <></>}
+
         </Toolbar>
       </Container>
     </AppBar>

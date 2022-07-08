@@ -61,7 +61,7 @@ export default function SignIn() {
 
     if (isSuccess || user) {
       dispatch(reset());
-      navigate('/')
+      navigate('/view-decks')
     }
     
     

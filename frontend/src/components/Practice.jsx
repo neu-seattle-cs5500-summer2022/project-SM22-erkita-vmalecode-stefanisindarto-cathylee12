@@ -8,18 +8,22 @@ import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ReactCardFlip from "react-card-flip";
-
-export default function CardView({deck}) {
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+export default function Practice() {
+  const params = useParams();
+  const deckID = params.deckid;
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID)).cards;
   const testDeck = [
-    {first: "first", back: "first card"},
-    {first: "second", back: "second card"},
-    {first: "third", back: "third card"},
+    {front: "first", back: "first card"},
+    {front: "second", back: "second card"},
+    {front: "third", back: "third card"},
   ];
 
   const [index, setIndex] = useState(0);
 
   function increment() {
-    setIndex(prevIndex => prevIndex + 1 < testDeck.length ? prevIndex + 1 : prevIndex);
+    setIndex(prevIndex => prevIndex + 1 < deck.length ? prevIndex + 1 : 0);
     console.log(index);
   }
 
@@ -54,7 +58,7 @@ export default function CardView({deck}) {
                   component="div"
                   align='center'
                 >
-                  {testDeck[index].first}
+                  {deck[index].front}
                 </Typography>
               </CardContent>
               <CardActions
@@ -98,7 +102,7 @@ export default function CardView({deck}) {
                   component="div"
                   align='center'
                 >
-                  {testDeck[index].back}
+                  {deck[index].back}
                 </Typography>
               </CardContent>
               <CardActions

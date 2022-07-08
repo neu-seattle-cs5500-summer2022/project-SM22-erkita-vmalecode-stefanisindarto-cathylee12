@@ -20,6 +20,18 @@ export const createDeck = createAsyncThunk(
     }
   }
 );
+export const deleteDeck = createAsyncThunk(
+  'data/delete',
+  async (deckData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.deleteDeck(deckData, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 export const addCard = createAsyncThunk(
   'data/addCard',
   async (cardData, thunkAPI) => {
@@ -38,7 +50,6 @@ export const removeCard = createAsyncThunk(
   'data/remove-card',
   async (cardData, thunkAPI) => {
     try {
-      console.log('[dataSlice/removeCard]',cardData);
       const token = thunkAPI.getState().auth.user.token;
       return await dataService.removeCard(cardData, token);
     } catch (error) {
@@ -74,9 +85,21 @@ export const dataSlice = createSlice({
       state.isError = false
       state.message = ''
     },
+    clear: (state) => initialState,
   },
   extraReducers: (builder) => {
     builder
+      .addCase(deleteDeck.fulfilled, (state,action) => {
+        state.isSuccess = true;
+        const deckIdx = getIdx(state.decks,action.payload.deckID);
+        state.decks.splice(deckIdx,1);
+      })
+      .addCase(removeCard.fulfilled, (state,action) => {
+        state.isSuccess = true;
+        const deckIdx = getIdx(state.decks,action.payload.deckID);
+        const cardIdx = getIdx(state.decks[deckIdx].cards,action.payload.cardID)
+        state.decks[deckIdx].cards.splice(cardIdx,1);
+      })
       .addCase(addCard.fulfilled, (state,action) => {
         state.isSuccess = true;
         state.isLoading = false;
@@ -84,9 +107,8 @@ export const dataSlice = createSlice({
         state.decks[idx].cards.push(action.payload);
       })
       .addCase(addCard.rejected, (state,action) => {
-        state.isSuccess = true;
+        state.isSuccess = false;
         state.message = false;
-        console.log('add card rejected',action.payload);
       })
       .addCase(createDeck.pending, (state) => {
         state.isLoading = true;
@@ -107,3 +129,4 @@ export const dataSlice = createSlice({
 });
 export default dataSlice.reducer;
 export const { reset } = dataSlice.actions
+export const { clear } = dataSlice.actions

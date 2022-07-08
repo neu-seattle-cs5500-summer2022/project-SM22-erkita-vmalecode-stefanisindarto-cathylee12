@@ -17,6 +17,13 @@ const CreateDeck = () => {
   const { isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.data
   )
+  const { user } = useSelector((state) => state.auth);
+  useEffect(()=> {
+    if (!user) {
+      navigate('/login');
+    }
+    
+  },[navigate]);
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);

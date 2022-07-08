@@ -25,8 +25,12 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {getDecks,reset} from '../features/dataSlice';
 import Moment from 'moment';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
-
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -37,22 +41,6 @@ function createData(name, calories, fat, carbs, protein) {
     protein,
   };
 }
-
-let rows = [
-  createData('CS asdfasfd5500', 159, 6.0, 24, 4.0),
-  createData('Words', 305, 3.7, 67, 4.3),
-  createData('Python', 452, 25.0, 51, 4.9),
-  createData('Java', 262, 16.0, 24, 6.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Bees', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwichs', 237, 9.0, 37, 4.3),
-  createData('Jelly Beans', 375, 0.0, 94, 0.0),
-  createData('Leetcode', 518, 26.0, 65, 7.0),
-  createData('JS', 392, 0.2, 98, 0.0),
-  createData('MERN Stack', 318, 0, 81, 2.0),
-  createData('Deck Name', 360, 19.0, 9, 37.0),
-  createData('Hello', 437, 18.0, 63, 4.0),
-];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -209,6 +197,9 @@ export default function EnhancedTable() {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth);
   const decks = useSelector((state) => state.data.decks);
+  const [err, setErr] = React.useState(false);
+  const [eMsg, setEmsg] = React.useState('');
+
   Moment.locale('en');
   useEffect(()=> {
     if (!user) {
@@ -217,6 +208,12 @@ export default function EnhancedTable() {
     dispatch(getDecks())
     
   },[navigate]);
+  useEffect(()=> {
+    dispatch(reset());    
+  },[decks]);
+  const handleClose = (e) => {
+    setErr(false);
+  }
 
   const closeBackdrop = () => {
     setOpen(false);
@@ -227,6 +224,18 @@ export default function EnhancedTable() {
   };
   const handleEdit = (e) => {
     navigate('/edit-deck/'+e._id);
+  };
+  
+  const handlePractice = (e) => {
+    console.log(e.cards.length);
+    if(e.cards.length > 0) {
+      navigate('/practice/'+e._id);
+    }
+    else {
+      setEmsg('Please add cards to practice');
+      setErr(true);
+    }
+
   };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -274,7 +283,7 @@ export default function EnhancedTable() {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-  rows = decks;
+  const rows = decks;
   return (
 
     <Box sx={{
@@ -284,7 +293,6 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
-      <Button component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -292,8 +300,15 @@ export default function EnhancedTable() {
       >
         {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
+      <Snackbar open={err} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          {eMsg}
+        </Alert>
+      </Snackbar>
+
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
+        <Button sx={{marginLeft: '20px'}} component={Link} to="/create-deck" variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Create New Deck </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -327,8 +342,8 @@ export default function EnhancedTable() {
                     >
                       <TableCell >
                         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button>Practice</Button>
-                          <Button onClick={() => openDetailView(row)}>Details</Button>
+                          <Button onClick={() => handlePractice(row)}>Practice</Button>
+                          <Button onClick={() => openDetailView(row)}>Delete</Button>
                           <Button onClick={() => handleEdit(row)} >Edit</Button>
                         </ButtonGroup>
                       </TableCell>
