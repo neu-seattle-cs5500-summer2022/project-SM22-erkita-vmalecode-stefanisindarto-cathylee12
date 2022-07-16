@@ -2,6 +2,7 @@ const dotenv = require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserSchema = require("../models/user.js");
+const emailValidator = require("email-validator");
 
 /*
  Login function checks if the user exists in the databse and if so,
@@ -34,6 +35,14 @@ async function login(req, res) {
   }
 }
 
+function isInvalidEmail(email) {
+  return !emailValidator.validate(email);
+}
+
+function isInvalidPassword(password) {
+  return password == null || password.length === 0 || password.length < 6;
+}
+
 /*
  Signup function checks if the user exists in the databse and if so,
  returns error message.
@@ -41,19 +50,26 @@ async function login(req, res) {
  If everything match, create a hashed password before storing the user details in database.
  Lastly, returns the user detail along with the user's token.
  */
+const signup = async (req, res) => {
+  const { email, password, firstName, lastName } = req.body;
+  try {
+    const existingUser = await UserSchema.findOne({ email });
 
-const signup = async(req, res) => {
-    const {email, password, firstName, lastName} = req.body;
-    try {
-        const existingUser = await UserSchema.findOne({email});
-
-
-    if (existingUser)
+    if (existingUser) {
       return res.status(404).json({ message: "User already exists." });
+    }
 
+    if (isInvalidEmail(email)) {
+      return res.status(401).json({ message: "Valid email required." });
+    }
 
-        const salt = await bcrypt.genSalt(12);
+    if (isInvalidPassword(password.toString())) {
+      return res
+        .status(401)
+        .json({ message: "Valid password of at least 6 characters required." });
+    }
 
+    const salt = await bcrypt.genSalt(12);
 
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -63,13 +79,17 @@ const signup = async(req, res) => {
       name: `${firstName} ${lastName}`,
     });
 
-        const token = jwt.sign({email: result.email, id: result.id}, process.env.SECRET, {expiresIn: "30d"});
+    const token = jwt.sign(
+      { email: result.email, id: result.id },
+      process.env.SECRET,
+      { expiresIn: "30d" }
+    );
 
-        res.status(200).json({result, token})
-    } catch (error) {
-        console.log("Server Error: ",error);
-        res.status(500).json({message: "Something went wrong."});
-    }
-}
+    res.status(200).json({ result, token });
+  } catch (error) {
+    console.log("Server Error: ", error);
+    res.status(500).json({ message: "Something went wrong." });
+  }
+};
 
 module.exports = { login, signup };
