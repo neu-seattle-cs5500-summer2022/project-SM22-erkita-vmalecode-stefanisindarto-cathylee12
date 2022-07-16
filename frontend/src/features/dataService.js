@@ -23,8 +23,7 @@ const deleteDeck = async(deckID,token) => {
   const deckData = {
     deckID: deckID,
   };
-  console.log('[dataService/deleteDeck]',API_URL +'decks/'+ deckID);
-  const response = await axios.delete(API_URL +'decks/'+ deckID, deckData, config);
+  const response = await axios.delete(API_URL +'decks/'+ deckID, config);
   return response.data;
 }
 const addCard = async(cardData,token) => {

@@ -91,7 +91,6 @@ export const dataSlice = createSlice({
     builder
       .addCase(deleteDeck.fulfilled, (state,action) => {
         state.isSuccess = true;
-        console.log('[case deletedeck.fulfilled]',action.payload);
         const deckIdx = getIdx(state.decks,action.payload.deckID);
         state.decks.splice(deckIdx,1);
       })
