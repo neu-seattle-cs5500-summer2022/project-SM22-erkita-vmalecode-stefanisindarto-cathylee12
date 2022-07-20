@@ -32,9 +32,13 @@ async function getCard(req, res) {
   } else {
     try {
       const card = await Flashcard.findById(cardId);
-      res.status(200).json(card);
+      if (!card) {
+        res.status(404).json({ message: "Card not found." });
+      } else {
+        res.status(200).json(card);
+      }
     } catch (err) {
-      res.status(404).json({ message: err.message });
+      res.status(400).json({ message: err.message });
     }
   }
 }
@@ -108,10 +112,14 @@ async function deleteCard(req, res) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
-      await Flashcard.findByIdAndRemove(cardId);
-      res.status(200).json({ message: "Card deleted successfully" });
+      const card = await Flashcard.findByIdAndDelete(cardId);
+      if (!card) {
+        res.status(404).json({ message: "Card not found." });
+      } else {
+        res.status(200).json({ message: "Card deleted successfully" });
+      }
     } catch (err) {
-      res.status(404).json({ message: err.message });
+      res.status(400).json({ message: err.message });
     }
   }
 }
