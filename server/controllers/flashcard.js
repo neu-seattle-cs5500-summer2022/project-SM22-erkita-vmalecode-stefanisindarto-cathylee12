@@ -2,7 +2,8 @@ const { default: mongoose } = require("mongoose");
 const Deck = require("../models/deck.js");
 const Flashcard = require("../models/flashcard.js");
 
-const invalidTokenMessage = "not found";
+const invalidTokenMessage = "Authentication not valid";
+const invalidDeckMessage = "Deck not found";
 
 async function createCard(req, res) {
   const deck = await Deck.findById(req.params.deckId);
@@ -11,11 +12,17 @@ async function createCard(req, res) {
     front: req.body.front,
     back: req.body.back,
   });
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
       await newCard.save();
+      await Deck.updateOne(
+        { _id: req.params.deckId },
+        { $push: { cards : newCard } }
+      );
       res.status(201).json(newCard);
       return newCard._id;
     } catch (err) {
@@ -27,7 +34,9 @@ async function createCard(req, res) {
 async function getCard(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -45,7 +54,9 @@ async function getCard(req, res) {
 
 async function getCards(req, res) {
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -62,7 +73,9 @@ async function getCards(req, res) {
 async function getFront(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -77,7 +90,9 @@ async function getFront(req, res) {
 async function getBack(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -92,7 +107,9 @@ async function getBack(req, res) {
 async function getCardRecallability(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -108,7 +125,9 @@ async function getCardRecallability(req, res) {
 async function deleteCard(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -116,6 +135,10 @@ async function deleteCard(req, res) {
       if (!card) {
         res.status(404).json({ message: "Card not found." });
       } else {
+        await Deck.updateOne(
+          { _id: req.params.deckId },
+          { $pullAll: { cards: [ { _id: cardId } ] } }
+        );
         res.status(200).json({ message: "Card deleted successfully" });
       }
     } catch (err) {
@@ -127,7 +150,9 @@ async function deleteCard(req, res) {
 async function updateFront(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -144,7 +169,9 @@ async function updateFront(req, res) {
 async function updateBack(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
@@ -161,7 +188,9 @@ async function updateBack(req, res) {
 async function updateRecallability(req, res) {
   const { cardId } = req.params;
   const deck = await Deck.findById(req.params.deckId);
-  if (req.userId === undefined || deck.userId !== req.userId) {
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
     res.status(401).json({ message: invalidTokenMessage });
   } else {
     try {
