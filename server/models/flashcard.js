@@ -16,6 +16,18 @@ const flashcardSchema = mongoose.Schema({
     enum: ["again", "hard", "good", "easy"],
     default: "again",
   },
+  interval: {
+    type: Number,
+    default: 0,
+  },
+  repetition: {
+    type: Number,
+    default: 0
+  },
+  efactor: {
+    type: Number,
+    default: 2.5,
+  },
 });
 
 module.exports = mongoose.model("Flashcard", flashcardSchema);

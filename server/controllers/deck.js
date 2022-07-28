@@ -2,12 +2,16 @@ const mongoose = require("mongoose");
 const DeckSchema = require("../models/deck.js");
 const invalidNameMessage = "Valid name required";
 const Flashcard = require("../models/flashcard.js");
+const CardsArray = require("../models/cardsArray.js");
+const intervalCalculator = require("./intervalCalculator.js");
 
 const {
   createCard,
   getCards,
   getCardRecallability,
 } = require("./flashcard.js");
+
+const authFailMessage = "Authentication not valid.";
 
 function onlyContainsWhiteSpace(req, res) {
   if (req.body.name.trim().length === 0) {
@@ -32,6 +36,10 @@ function isValidName(req, res) {
     return true;
   }
   return false;
+}
+
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
 async function createDeck(req, res) {
@@ -159,6 +167,90 @@ async function deleteDeck(req, res) {
   res.json({ message: "Deck deleted",deckID:id });
 }
 
+async function practiceDeck(req, res) {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ message: "Deck with ID " + id + " not found" });
+  }
+  const deck = await DeckSchema.findById(id);
+  if (!deck) return res.status(404).json({ message: "Deck with ID " + id + " not found" });
+  if (deck.userId !== req.userId) {
+    return res.status(403).json({ message: authFailMessage });
+  }
+  if (!deck.cards.length) {
+    return res.status(405).json({ message: "Cards empty." });
+  }
+  try {
+    let cardsArray = await CardsArray.findOne({ deckID: id });
+    const shuffledArray = shuffleArray(deck.cards);
+    if (!cardsArray) {
+      cardsArray = new CardsArray({ deckID: id, cards: shuffledArray });
+    } else {
+      cardsArray.cards = shuffledArray;
+    }
+    await cardsArray.save();
+    let cards = cardsArray.cards;
+    let card = await Flashcard.findById(cards[0]);
+    res.json(card);
+    let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
+    card.interval = nextInterval;
+    card.repetition = nextRepetition;
+    card.efactor = nextEfactor;
+    await card.save();
+    if (cards.length > nextInterval) {
+      cards.splice(nextInterval + 1, 0, card);
+    } else {
+      cards.push(card);
+    }
+    cards.shift();
+    await cardsArray.save();
+  } catch (error) {
+    res.status(400).json({ messeage: "Something went wrong" });
+  }
+}
+
+async function nextCard(req, res) {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ message: "Deck with ID " + id + " not found" });
+  }
+  const deck = await DeckSchema.findById(id);
+  if (!deck) return res.status(404).json({ message: "Deck with ID " + id + " not found" });
+  if (deck.userId !== req.userId) {
+    return res.status(403).json({ message: authFailMessage });
+  }
+  const cardsArray = await CardsArray.findOne({ deckID: id });
+  if (!cardsArray) {
+    return res.status(404).json({ message: "Go to /practice." });
+  }
+  if (!cardsArray.cards) {
+    return res.status(404).json({ message: "Cards empty." });
+  }
+  try {
+    let cards = cardsArray.cards;
+    let card = await Flashcard.findById(cards[0]);
+    res.json(card);
+    let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
+    card.interval = nextInterval;
+    card.repetition = nextRepetition;
+    card.efactor = nextEfactor;
+    await card.save();
+    if (cards.length > nextInterval) {
+      cards.splice(nextInterval + 1, 0, card);
+    } else {
+      cards.push(card);
+    }
+    cards.shift();
+    await cardsArray.save();
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong." });
+  }
+}
+
 module.exports = {
   createDeck,
   getDeck,
@@ -168,4 +260,6 @@ module.exports = {
   deleteDeck,
   pushFlashcard,
   removeFlashcard,
+  practiceDeck,
+  nextCard,
 };
