@@ -6,6 +6,7 @@ const deckSchema = mongoose.Schema({
   userId: { type: String },
   name: { type: String, required: true },
   recallabilityPercentage: { type: Number, min: 0, max: 100, default: 0 },
+  public : { type: Boolean, default: false },
   lastReviewed: { type: Date, default: Date.now },
   dateCreated: { type: Date, default: new Date() },
   cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard'}]
