@@ -66,6 +66,7 @@ async function createDeck(req, res) {
     try {
       const newDeck = new DeckSchema({
         name: req.body.name,
+        public: req.body.public,
         userId: req.userId,
         lastReviewed: new Date().now,
         dateCreated: new Date(),
@@ -154,6 +155,15 @@ async function getDecks(req, res) {
   }
 }
 
+async function getPublicDecks(req, res) {
+  try {
+    const decks = await DeckSchema.find({ public: true });
+    res.status(200).json(decks);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
+
 async function getDeckFlashcards(req, res) {
   return getCards(req, res);
 }
@@ -174,6 +184,18 @@ async function updateDeckName(req, res) {
     }
   }
   res.status(404).json({ message: invalidNameMessage });
+}
+
+async function updatePublicDeck(req, res) {
+  const { id } = req.params;
+  try {
+    const deck = await DeckSchema.findById(id);
+    deck.public = req.body.public;
+    await deck.save();
+    res.status(200).json(deck);
+  } catch (error) {
+    res.status(404).json({ message: "Deck with ID " + id + " not found" });
+  }
 }
 
 async function deleteDeck(req, res) {
@@ -271,7 +293,9 @@ module.exports = {
   getDeck,
   getDeckFlashcards,
   getDecks,
+  getPublicDecks,
   updateDeckName,
+  updatePublicDeck,
   deleteDeck,
   /*
   pushFlashcard,
