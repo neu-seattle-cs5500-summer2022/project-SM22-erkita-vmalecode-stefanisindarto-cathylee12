@@ -6,15 +6,14 @@ const CardsArray = require("../models/cardsArray.js");
 const intervalCalculator = require("./intervalCalculator.js");
 
 const {
-  createCard,
   getCards,
-  getCardRecallability,
+  deleteCard,
 } = require("./flashcard.js");
 
-const authFailMessage = "Authentication not valid.";
+const invalidTokenMessage = "Authentication not valid";
 
 function onlyContainsWhiteSpace(req, res) {
-  if (req.body.name.trim().length === 0) {
+  if (req.body.name && req.body.name.trim().length === 0) {
     return true;
   }
   return false;
@@ -42,6 +41,26 @@ function shuffleArray(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
+function isObjectIdValid(res, id) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ message: "Deck with ID " + id + " not found" });
+  }
+}
+
+function isDeckValid(res, id, deck) {
+  if (deck == null) {
+    return res.status(404).json({ message: "Deck with ID " + id + " not found" });
+  }
+}
+
+function isUserValid(req, res, deck) {
+  if (deck.userId !== req.userId) {
+    return res.status(401).json({ message: invalidTokenMessage });
+  }
+}
+
 async function createDeck(req, res) {
   if (isValidName(req, res)) {
     try {
@@ -62,6 +81,7 @@ async function createDeck(req, res) {
   }
 }
 
+/*
 async function removeFlashcard(req,res) {
   try {
     // Verify authorization:
@@ -113,14 +133,16 @@ async function pushFlashcard(req,res) {
     console.log(error);
   }
 }
+*/
 async function getDeck(req, res) {
   const { id } = req.params;
-  try {
-    const foundDeck = await DeckSchema.findById(id);
-    res.status(200).json(foundDeck);
-  } catch (error) {
-    res.status(404).json({ message: "Deck with ID " + id + " not found" });
+  isObjectIdValid(res, id);
+  const deck = await DeckSchema.findById(id);
+  if (!deck) {
+    return res.status(404).json({ message: "Deck with ID " + id + " not found" });
   }
+  isUserValid(req, res, deck);
+  res.status(200).json(deck);
 }
 
 async function getDecks(req, res) {
@@ -149,8 +171,11 @@ async function getDeckFlashcards(req, res) {
 async function updateDeckName(req, res) {
   if (isValidName(req, res)) {
     const { id } = req.params;
+    isObjectIdValid(res, id);
     try {
       const deck = await DeckSchema.findById(id);
+      isDeckValid(res, id, deck);
+      isUserValid(req, res, deck);
       deck.name = req.body.name;
       await deck.save();
       res.status(200).json(deck);
@@ -175,47 +200,43 @@ async function updatePublicDeck(req, res) {
 
 async function deleteDeck(req, res) {
   const { id } = req.params;
+  isObjectIdValid(res, id);
   const deck = await DeckSchema.findById(id);
+  isDeckValid(res, id, deck);
   // Check authorization
-  if (deck.userId !== req.userId) {
-    return res.status(403);
+  isUserValid(req, res, deck);
+  try {
+    await CardsArray.findOneAndDelete({ deckId: id });
+    const cards = deck.cards;
+    cards.forEach(async (card) => await Flashcard.findByIdAndDelete(card._id));
+    await DeckSchema.findByIdAndRemove(id);
+    res.status(200).json({ message: "Deck deleted", deckID: id });
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong" });
   }
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(404)
-      .json({ message: "Could not delete deck with invalid ID: " + id });
-  }
-  await DeckSchema.findByIdAndRemove(id);
-  res.json({ message: "Deck deleted",deckID:id });
 }
 
 async function practiceDeck(req, res) {
   const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(404)
-      .json({ message: "Deck with ID " + id + " not found" });
-  }
+  isObjectIdValid(res, id);
   const deck = await DeckSchema.findById(id);
-  if (!deck) return res.status(404).json({ message: "Deck with ID " + id + " not found" });
-  if (deck.userId !== req.userId) {
-    return res.status(403).json({ message: authFailMessage });
-  }
+  isDeckValid(res, id, deck);
+  isUserValid(req, res, deck);
   if (!deck.cards.length) {
     return res.status(405).json({ message: "Cards empty." });
   }
   try {
-    let cardsArray = await CardsArray.findOne({ deckID: id });
+    let cardsArray = await CardsArray.findOne({ deckId: id });
     const shuffledArray = shuffleArray(deck.cards);
     if (!cardsArray) {
-      cardsArray = new CardsArray({ deckID: id, cards: shuffledArray });
+      cardsArray = new CardsArray({ deckId: id, cards: shuffledArray });
     } else {
       cardsArray.cards = shuffledArray;
     }
     await cardsArray.save();
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    res.json(card);
+    res.status(200).json(card);
     let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
     card.interval = nextInterval;
     card.repetition = nextRepetition;
@@ -235,17 +256,11 @@ async function practiceDeck(req, res) {
 
 async function nextCard(req, res) {
   const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(404)
-      .json({ message: "Deck with ID " + id + " not found" });
-  }
+  isObjectIdValid(res, id);
   const deck = await DeckSchema.findById(id);
-  if (!deck) return res.status(404).json({ message: "Deck with ID " + id + " not found" });
-  if (deck.userId !== req.userId) {
-    return res.status(403).json({ message: authFailMessage });
-  }
-  const cardsArray = await CardsArray.findOne({ deckID: id });
+  isDeckValid(res, id, deck);
+  isUserValid(req, res, deck);
+  const cardsArray = await CardsArray.findOne({ deckId: id });
   if (!cardsArray) {
     return res.status(404).json({ message: "Go to /practice." });
   }
@@ -255,7 +270,7 @@ async function nextCard(req, res) {
   try {
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    res.json(card);
+    res.status(200).json(card);
     let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
     card.interval = nextInterval;
     card.repetition = nextRepetition;
@@ -282,8 +297,10 @@ module.exports = {
   updateDeckName,
   updatePublicDeck,
   deleteDeck,
+  /*
   pushFlashcard,
   removeFlashcard,
+  */
   practiceDeck,
   nextCard,
 };

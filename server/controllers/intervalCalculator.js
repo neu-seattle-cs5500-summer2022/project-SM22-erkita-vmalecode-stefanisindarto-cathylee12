@@ -1,3 +1,7 @@
+/*
+Algorithm from "Supermemo" package
+*/
+
 module.exports = function intervalCalculator(card) {
   let grade = 2;
   if (card.recallability == "hard") {
