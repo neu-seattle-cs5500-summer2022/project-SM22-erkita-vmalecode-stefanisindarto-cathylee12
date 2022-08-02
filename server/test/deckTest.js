@@ -5,6 +5,9 @@ let chaiHttp = require("chai-http");
 let mongoose = require("mongoose");
 let server = require("../index.js");
 let DeckSchema = require("../models/deck");
+let Flashcard = require("../models/flashcard");
+const sinon = require("sinon");
+const authentication = require("../middleware/authentication");
 chai.use(chaiHttp);
 
 //Assertion Style
@@ -24,7 +27,7 @@ describe("POST Decks", function () {
   it("POST, add one test deck and DELETE", function (done) {
     chai
       .request(server)
-      .post("/decks")
+      .post("/api/decks")
       .send({ name: "test deck" })
       .end(function (err, res) {
         res.should.have.status(201);
@@ -34,7 +37,7 @@ describe("POST Decks", function () {
         res.body.name.should.equal("test deck");
         chai
           .request(server)
-          .delete("/decks/" + res.body._id)
+          .delete("/api/decks/" + res.body._id)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a("object");
@@ -47,7 +50,7 @@ describe("POST Decks", function () {
   it("POST Error, test createDeck with no input", function (done) {
     chai
       .request(server)
-      .post("/decks")
+      .post("/api/decks")
       .send({})
       .end(function (err, res) {
         res.should.have.status(409);
@@ -60,7 +63,7 @@ describe("POST Decks", function () {
   it("POST Error, test createDeck with empty string name", function (done) {
     chai
       .request(server)
-      .post("/decks")
+      .post("/api/decks")
       .send({ name: "" })
       .end(function (err, res) {
         res.should.have.status(409);
@@ -73,7 +76,7 @@ describe("POST Decks", function () {
   it("POST Error, test createDeck with whitespace string name", function (done) {
     chai
       .request(server)
-      .post("/decks")
+      .post("/api/decks")
       .send({ name: " " })
       .end(function (err, res) {
         res.should.have.status(404);
@@ -86,7 +89,7 @@ describe("POST Decks", function () {
   it("POST Error, test createDeck with special character string name", function (done) {
     chai
       .request(server)
-      .post("/decks")
+      .post("/api/decks")
       .send({ name: "?!" })
       .end(function (err, res) {
         res.should.have.status(404);
@@ -97,11 +100,24 @@ describe("POST Decks", function () {
   });
 });
 
+before(function (done) {
+  chai.request
+    .agent(server)
+    .post("/api/login")
+    .send(userCredentialsLogin)
+    .end(function (err, response) {
+      expect(response.statusCode).to.equal(200);
+      expect("Location", "/view-decks");
+      done();
+    });
+});
+
+/* Need auth part, will be done later
 describe("GET Decks", function () {
   it("GET, get first deck in db", (done) => {
     chai
       .request(server)
-      .get("/decks")
+      .get("/api/decks")
       .end((err, res) => {
         res.should.have.status(200);
         should.exist(res.body);
@@ -115,7 +131,7 @@ describe("GET Decks", function () {
   it("GET, get deck by ID", (done) => {
     chai
       .request(server)
-      .get("/decks/" + testDeckId)
+      .get("/api/decks/" + testDeckId)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.have.property("name");
@@ -127,7 +143,7 @@ describe("GET Decks", function () {
   it("GET Error, get deck by invalid ID", (done) => {
     chai
       .request(server)
-      .get("/decks/" + invalidId)
+      .get("/api/decks/" + invalidId)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -141,7 +157,7 @@ describe("PATCH Deck name", function () {
   it("PATCH, update test deck name", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + testDeckId)
+      .patch("/api/decks/" + testDeckId)
       .send({ name: "Spanish Vocab 1" })
       .end((err, res) => {
         res.should.have.status(200);
@@ -156,7 +172,7 @@ describe("PATCH Deck name", function () {
   it("PATCH, update test deck name with special character", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + testDeckId)
+      .patch("/api/decks/" + testDeckId)
       .send({ name: "Spanish Vocabs!" })
       .end((err, res) => {
         res.should.have.status(200);
@@ -169,7 +185,7 @@ describe("PATCH Deck name", function () {
   it("Revert for future test purposes", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + testDeckId)
+      .patch("/api/decks/" + testDeckId)
       .send({ name: testDeckName })
       .end((err, res) => {
         res.should.have.status(200);
@@ -182,7 +198,7 @@ describe("PATCH Deck name", function () {
   it("PATCH, error update deck with invalid id", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + invalidId)
+      .patch("/api/decks/" + invalidId)
       .send({ name: "failed patch" })
       .end((err, res) => {
         res.should.have.status(404);
@@ -195,7 +211,7 @@ describe("PATCH Deck name", function () {
   it("PATCH, error update deck with invalid whitespace name", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + testDeckId)
+      .patch("/api/decks/" + testDeckId)
       .send({ name: "   " })
       .end((err, res) => {
         res.should.have.status(404);
@@ -208,7 +224,7 @@ describe("PATCH Deck name", function () {
   it("PATCH, error update deck with invalid special character name", (done) => {
     chai
       .request(server)
-      .patch("/decks/" + testDeckId)
+      .patch("/api/decks/" + testDeckId)
       .send({ name: ">!" })
       .end((err, res) => {
         res.should.have.status(404);
@@ -223,13 +239,127 @@ describe("DELETE Invalid Decks", function () {
   it("DELETE, test deck with invalid ID", function (done) {
     chai
       .request(server)
-      .delete("/decks/" + invalidId)
+      .delete("/api/decks/" + invalidId)
       .end(function (err, res) {
         res.should.have.status(404);
         res.body.should.be.a("object");
         res.body.should.have
           .property("message")
           .eql("Could not delete deck with invalid ID: " + invalidId);
+        done();
+      });
+  });
+});
+*/
+
+
+let practiceDeckId;
+describe("Practice cards", function () {
+
+  middlewareStub =
+    sinon
+      .stub(authentication, 'authentication')
+      .callsFake((req, res, next) => { next() });
+
+  it("CREATE a test deck for practice", function (done) {
+    chai
+      .request(server)
+      .post("/api/decks/")
+      .send({ name: "test deck for practice" })
+      .end(function (err, res) {
+        res.should.have.status(201);
+        practiceDeckId = res.body['_id'];
+        done();
+      });
+  });
+
+  it("again, repetition: 0, interval: 0 => interval: 1", function (done) {
+    chai
+      .request(server)
+      .post("/api/decks/" + practiceDeckId + "/cards")
+      .send({
+        front: "front1",
+        back: "back1"
+      })
+      .end(function (err, res) {
+        res.should.have.status(201);
+        res.body.should.have.property('interval').eql(0);
+        res.body.should.have.property('repetition').eql(0);
+        res.body.should.have.property('efactor').eql(2.5);
+        chai
+          .request(server)
+          .get("/api/decks/" + practiceDeckId + "/practice")
+          .end(function (err, res) {
+            res.should.have.status(200);
+            chai
+              .request(server)
+              .get("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
+              .end(function (err, res) {
+                res.should.have.status(200);
+                res.body.should.have.property('interval').eql(1);
+                chai
+                  .request(server)
+                  .delete("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
+                  .end(function (err, res) {
+                    res.should.have.status(200);
+                    done();
+                  });
+              });
+          });
+      });
+  });
+
+  it("good, repetition: 1, interval: 1 => interval: 6", function (done) {
+    chai
+      .request(server)
+      .post("/api/decks/" + practiceDeckId + "/cards")
+      .send({
+        front: "front2",
+        back: "back2",
+      })
+      .end(function (err, res) {
+        res.should.have.status(201);
+        chai
+          .request(server)
+          .patch("/api/decks/" + practiceDeckId +
+                  "/cards/" + res.body['_id'] + "/recallability")
+          .send({ recallability: "good" })
+          .end(function (err, res) {
+            res.should.have.status(200);
+            chai
+              .request(server)
+              .get("/api/decks/" + practiceDeckId + "/practice")
+              .end(function (err, res) {
+                res.should.have.status(200);
+                res.body.should.have.property('repetition').eql(0);
+                res.body.should.have.property('interval').eql(0);
+                chai
+                  .request(server)
+                  .get("/api/decks/" + practiceDeckId + "/practice/next")
+                  .end(function (err, res) {
+                    res.should.have.status(200);
+                    res.body.should.have.property('repetition').eql(1);
+                    res.body.should.have.property('interval').eql(1);
+                    chai
+                      .request(server)
+                      .get("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
+                      .end(function (err, res) {
+                        res.should.have.status(200);
+                        res.body.should.have.property('interval').eql(6);
+                        done();
+                      });
+                  });
+              });
+          });
+      });
+  });
+
+  it("Restore DB", function (done) {
+    chai
+      .request(server)
+      .delete("/api/decks/" + practiceDeckId)
+      .end(function (err, res) {
+        res.should.have.status(200);
         done();
       });
   });
