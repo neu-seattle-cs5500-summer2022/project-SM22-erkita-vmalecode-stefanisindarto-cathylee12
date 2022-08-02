@@ -9,7 +9,6 @@ async function authentication(req, res, next) {
   try {
     const token = req.headers.authorization;
     const isCustomAuth = true;
-
     let decodedData;
     const SECRET = process.env.SECRET;
 

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node index.js",
+    "dev": "nodemon server/index.js",
     "test": "mocha",
     "server": "nodemon server/index.js",
     "db": "mongod --dbpath /usr/local/var/mongodb/ --rest",
@@ -30,7 +30,7 @@
     "chai": "^3.2.0",
     "chai-http": "^1.0.0",
     "mocha": "^10.0.0",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.19",
     "prettier": "2.6.2",
     "should": "^13.2.3"
   }

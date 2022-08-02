@@ -139,7 +139,7 @@ async function deleteCard(req, res) {
           { _id: req.params.deckId },
           { $pullAll: { cards: [ { _id: cardId } ] } }
         );
-        res.status(200).json({ message: "Card deleted successfully" });
+        res.status(200).json({ message: "Card deleted successfully",cardId: cardId });
       }
     } catch (err) {
       res.status(400).json({ message: err.message });
