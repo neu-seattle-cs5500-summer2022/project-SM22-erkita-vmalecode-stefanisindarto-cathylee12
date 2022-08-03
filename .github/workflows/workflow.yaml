@@ -16,6 +16,5 @@ jobs:
           node-version: "18"
 
       - name: Run the test & Build
-        run: |
-          npm install
+        run:
           npm test
