@@ -12,11 +12,11 @@ router.get("/", authentication, deckController.getDecks);
 router.get("/public", authentication, deckController.getPublicDecks);
 router.get("/:id/practice", authentication, deckController.practiceDeck);
 router.get("/:id/practice/next", authentication, deckController.nextCard);
-router.patch("/:id", authentication, deckController.updatePublicDeck);
+router.patch("/:id/public", authentication, deckController.updatePublicDeck);
 // // router.post("/:id", authentication, deckController.addFlashcard);
 // router.get("/:id/cards", authentication, deckController.getDeckFlashcards);
 router.get("/:id", authentication, deckController.getDeck);
 // // router.get("/study/:id", deckController.getStudyDeck);
-// router.patch("/:id", authentication, deckController.updateDeckName);
+router.patch("/:id", authentication, deckController.updateDeckName);
 
 module.exports = router;
