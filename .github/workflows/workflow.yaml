@@ -16,6 +16,13 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Run the test & Build
-        run:
-          npm test
+      - name: Install dependencies
+        run: |
+          npm install
+          npm i mocha
+          npm i chai
+          npm i chai-http
+          npm i sinon
+
+      - name: Run test
+        run: npm test
