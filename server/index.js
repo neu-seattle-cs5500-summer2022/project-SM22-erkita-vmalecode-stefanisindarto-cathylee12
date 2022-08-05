@@ -30,7 +30,7 @@ mongoose.Promise = global.Promise;
 
 
 mongoose
-  .connect(mongoEndpoint)
+  .connect("mongodb+srv://admin1:test1@cluster0.9p95o.mongodb.net/?retryWrites=true&w=majority")
   .then(() =>
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
   )
