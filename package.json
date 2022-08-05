@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node index.js",
-    "test": "mocha server/test/deckTest.js --timeout 5000",
+    "test": "mocha server/test/deckTest.js --timeout 5000 --reporter mochawesome --exit",
     "server": "nodemon server/index.js",
     "db": "mongod --dbpath /usr/local/var/mongodb/ --rest",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --legacy-peer-deps --prefix frontend && npm run build --prefix frontend"
