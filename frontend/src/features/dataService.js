@@ -14,16 +14,16 @@ const createDeck = async(deckName,token) => {
   const response = await axios.post(API_URL +'decks', deckData, config);
   return response.data;
 }
-const deleteDeck = async(deckID,token) => {
+const deleteDeck = async(deckId,token) => {
   const config = {
     headers: {
       Authorization: token
     },
   };
   const deckData = {
-    deckID: deckID,
+    deckId: deckId,
   };
-  const response = await axios.delete(API_URL +'decks/'+ deckID, config);
+  const response = await axios.delete(API_URL +'decks/'+ deckId, config);
   return response.data;
 }
 const addCard = async(cardData,token) => {
@@ -32,16 +32,17 @@ const addCard = async(cardData,token) => {
       Authorization: token
     },
   };
-  const response = await axios.post(API_URL +'decks/push-card', cardData, config);
+  const response = await axios.post(API_URL +'decks/'+cardData.deckId+'/cards', cardData, config);
   return response.data;
 }
 const removeCard = async(cardData,token) => {
+  
   const config = {
     headers: {
       Authorization: token
     },
   };
-  const response = await axios.post(API_URL +'decks/remove-card', cardData, config);
+  const response = await axios.delete(API_URL +'decks/' + cardData.deckId + '/cards/' + cardData.cardId, config);
   return response.data;
 }
 const getDecks = async(token) => {
@@ -54,12 +55,21 @@ const getDecks = async(token) => {
   const response = await axios.get(API_URL +'decks', config);
   return response.data;
 }
-
+const getCards = async(deckData,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const response = await axios.get(API_URL +'decks/'+deckData.deckId + '/cards', config);
+  return response.data;
+}
 const dataService = {
   createDeck,
   getDecks,
   addCard,
   removeCard,
-  deleteDeck
+  deleteDeck,
+  getCards,
 }
 export default dataService;

@@ -9,6 +9,7 @@ const router = express.Router();
 router.delete("/:id", authentication, deckController.deleteDeck);
 router.post("/", authentication, deckController.createDeck);
 router.get("/", authentication, deckController.getDecks);
+
 router.get("/public", authentication, deckController.getPublicDecks);
 router.get("/:id/practice", authentication, deckController.practiceDeck);
 router.get("/:id/practice/next", authentication, deckController.nextCard);

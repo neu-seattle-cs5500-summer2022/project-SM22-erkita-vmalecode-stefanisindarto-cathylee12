@@ -143,26 +143,28 @@ async function getCardRecallability(req, res) {
 async function deleteCard(req, res) {
   const { deckId } = req.params;
   const { cardId } = req.params;
-  isObjectIdValid(res, deckId, cardId);
-  const deck = await Deck.findById(deckId);
-  isDeckValid(res, deck);
-  isUserValid(req, res, deck);
-  try {
-    const card = await Flashcard.findByIdAndDelete(cardId);
-    if (!card) {
-      res.status(404).json({ message: "Card not found." });
-    } else {
-      await Deck.updateOne(
-        { _id: req.params.deckId },
-        { $pullAll: { cards: [ { _id: cardId } ] } }
-      );
-      res.status(200).json({ message: "Card deleted successfully" });
+  const deck = await Deck.findById(req.params.deckId);
+  if (deck == null) {
+    res.status(404).json({ message: invalidDeckMessage });
+  } else if (req.userId === undefined || deck.userId !== req.userId) {
+    res.status(401).json({ message: invalidTokenMessage });
+  } else {
+    try {
+      const card = await Flashcard.findByIdAndDelete(cardId);
+      if (!card) {
+        res.status(404).json({ message: "Card not found." });
+      } else {
+        await Deck.updateOne(
+          { _id: req.params.deckId },
+          { $pullAll: { cards: [ { _id: cardId } ] } }
+        );
+        res.status(200).json({ message: "Card deleted successfully",cardId: cardId });
+      }
+    } catch (err) {
+      res.status(400).json({ message: err.message });
     }
-  } catch (err) {
-    res.status(400).json({ message: err.message });
   }
 }
-
 async function updateFront(req, res) {
   const { deckId } = req.params;
   const { cardId } = req.params;
