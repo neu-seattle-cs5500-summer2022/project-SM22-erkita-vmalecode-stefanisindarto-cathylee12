@@ -90,7 +90,6 @@ async function removeFlashcard(req,res) {
       res.status(403);
       return
     }
-    console.log('[deckController/removeFlashcard]',req.body);
     cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
     await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
       $pull: { cards: {_id: req.body.cardID} }

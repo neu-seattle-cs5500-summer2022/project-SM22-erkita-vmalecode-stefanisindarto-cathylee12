@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node index.js",
-    "test": "mocha server/test/deckTest.js --timeout 5000",
+    "test": "mocha server/test/deckTest.js --timeout 5000 --reporter mochawesome --exit",
     "server": "nodemon server/index.js",
     "db": "mongod --dbpath /usr/local/var/mongodb/ --rest",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --legacy-peer-deps --prefix frontend && npm run build --prefix frontend"
@@ -30,7 +30,7 @@
     "chai": "^3.2.0",
     "chai-http": "^1.0.0",
     "mocha": "^10.0.0",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.19",
     "prettier": "2.6.2",
     "should": "^13.2.3",
     "sinon": "^14.0.0"

@@ -18,11 +18,11 @@ import { visuallyHidden } from '@mui/utils';
 import { Button, ButtonGroup } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
-import { useParams,useNavigate,Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { IoMdAddCircle } from 'react-icons/io'
 import Moment from 'moment';
-import {getDecks,reset,removeCard} from '../features/dataSlice';
+import { getDecks, reset, removeCard, getCards } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
 
 
@@ -150,8 +150,19 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
   const params = useParams()
-  const deckID = params.deckid
-  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
+  const deckId = params.deckid
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // const [deck, setDeck] = useState(null);
+  const deckData = {
+    deckId: deckId
+  }
+
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckId));
+  useEffect(() => {
+    dispatch(getCards(deckData));
+
+  }, [navigate])
 
   return (
 
@@ -203,13 +214,13 @@ export default function EnhancedTable() {
     setOpen(false);
   };
   const handleEdit = (e) => {
-    
+
   };
   const handleDelete = (e) => {
-    
-    const cardData  ={
-      cardID : e._id,
-      deckID : deckID
+
+    const cardData = {
+      cardId: e._id,
+      deckId: deckId
     }
     dispatch(removeCard(cardData));
   }
@@ -268,17 +279,18 @@ export default function EnhancedTable() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const params = useParams();
-  const deckID = params.deckid;
-  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
-  rows = deck.cards;
-  useEffect(()=> {
+  const deckId = params.deckid;
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckId));
+  const cards = useSelector((state) => state.data.activeDeck);
+  rows = cards;
+  useEffect(() => {
     dispatch(reset());
     dispatch(getDecks());
-    
-  },[navigate]);
-  useEffect(()=> {
-    dispatch(reset());    
-  },[deck]);
+
+  }, []);
+  useEffect(() => {
+    dispatch(reset());
+  }, [deck]);
   return (
 
     <Box sx={{
@@ -298,7 +310,7 @@ export default function EnhancedTable() {
       </Backdrop>
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
-        <Button sx={{marginLeft: '20px'}} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button sx={{ marginLeft: '20px' }} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -347,8 +359,8 @@ export default function EnhancedTable() {
                       <TableCell align="right">{row.back}</TableCell>
                       <TableCell align="right">
                         {Moment(row.dateCreated).format('MMM D, YYYY')}
-                      
-                    </TableCell>
+
+                      </TableCell>
 
                     </TableRow>
                   );
