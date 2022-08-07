@@ -2,6 +2,8 @@ let chai = require("chai"),
   expect = chai.expect;
 let chaiHttp = require("chai-http");
 var app = require("../index.js");
+const sinon = require("sinon");
+const authentication = require("../middleware/authentication");
 
 //Assertion Style
 chai.should();
@@ -40,22 +42,32 @@ const invalidPasswordSignUp = {
 };
 
 describe("POST user log in", function () {
-  it("POST, valid log in credential", function (done) {
-    chai.request
-      .agent(app)
-      .post(loginUrl)
-      .send(userCredentialsLogin)
-      .end(function (err, response) {
-        expect(response.statusCode).to.equal(200);
-        expect("Location", viewDeckUrl);
-        chai
-          .request(app)
-          .get(viewDeckUrl)
-          .end((err, res) => {
-            expect(200, done);
-            done();
-          });
+  this.beforeEach(() => {
+    middlewareStub = sinon
+      .stub(authentication, "authentication")
+      .callsFake((req, res, next) => {
+        next();
       });
+    it("POST, valid log in credential", function (done) {
+      chai.request
+        .agent(app)
+        .post(loginUrl)
+        .send(userCredentialsLogin)
+        .end(function (err, response) {
+          expect(response.statusCode).to.equal(200);
+          expect("Location", viewDeckUrl);
+          chai
+            .request(app)
+            .get(viewDeckUrl)
+            .end((err, res) => {
+              expect(200, done);
+              done();
+            });
+        });
+    });
+  });
+  this.afterEach(() => {
+    middlewareStub.restore();
   });
 
   it("POST, invalid log in password", function (done) {
@@ -102,22 +114,32 @@ describe("POST user log in", function () {
 });
 
 describe("POST sign up", function () {
-  it("POST, valid sign up credential", function (done) {
-    chai.request
-      .agent(app)
-      .post(signupUrl)
-      .send(newUserCredentialsSignUp)
-      .end(function (err, response) {
-        expect(response.statusCode).to.equal(200);
-        expect("Location", viewDeckUrl);
-        chai
-          .request(app)
-          .get(viewDeckUrl)
-          .end((err, res) => {
-            expect(200, done);
-            done();
-          });
+  this.beforeEach(() => {
+    middlewareStub = sinon
+      .stub(authentication, "authentication")
+      .callsFake((req, res, next) => {
+        next();
       });
+    it("POST, valid sign up credential", function (done) {
+      chai.request
+        .agent(app)
+        .post(signupUrl)
+        .send(newUserCredentialsSignUp)
+        .end(function (err, response) {
+          expect(response.statusCode).to.equal(200);
+          expect("Location", viewDeckUrl);
+          chai
+            .request(app)
+            .get(viewDeckUrl)
+            .end((err, res) => {
+              expect(200, done);
+              done();
+            });
+        });
+    });
+  });
+  this.afterEach(() => {
+    middlewareStub.restore();
   });
 
   it("POST, existing user sign up", function (done) {
