@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { useParams } from 'react-router-dom';
 import dataService from './dataService';
 
 const initialState = {
@@ -7,7 +8,8 @@ const initialState = {
   isSuccess: false,
   isLoading: false,
   message: '',
-  activeDeck: [{}]
+  activeDeck: [{}],
+  card: null,
 };
 export const createDeck = createAsyncThunk(
   'data/create',
@@ -83,6 +85,42 @@ export const getCards = createAsyncThunk(
     }
   }
 );
+export const practiceCards = createAsyncThunk(
+  'data/practiceCards',
+  async (deckData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.practiceCards(deckData, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+export const nextCard = createAsyncThunk(
+  'data/nextCard',
+  async (deckData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.nextCard(deckData, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+export const updateRecallability = createAsyncThunk(
+  'data/updateRecallability',
+  async ({deckData, cardData, newRecallability}, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.updateRecallability(deckData, cardData, newRecallability, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 const getIdx = (decks, deckId) => {
   const deck = decks.find((deck) => deck._id === deckId);
   return decks.indexOf(deck)
@@ -137,6 +175,15 @@ export const dataSlice = createSlice({
       .addCase(getDecks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.decks = action.payload;
+      })
+      .addCase(practiceCards.fulfilled, (state, action) => {
+        state.card = action.payload;
+      })
+      .addCase(nextCard.fulfilled, (state, action) => {
+        state.card = action.payload;
+      })
+      .addCase(updateRecallability.fulfilled, (state, action) => {
+        state.card = action.payload;
       })
   }
 });
