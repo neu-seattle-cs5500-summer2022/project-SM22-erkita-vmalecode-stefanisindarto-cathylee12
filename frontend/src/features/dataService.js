@@ -64,6 +64,34 @@ const getCards = async(deckData,token) => {
   const response = await axios.get(API_URL +'decks/'+deckData.deckId + '/cards', config);
   return response.data;
 }
+const practiceCards = async(deckData,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const response = await axios.get(API_URL +'decks/'+deckData.deckId + '/practice', config);
+  return response.data;
+}
+const nextCard = async(deckData,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const response = await axios.get(API_URL +'decks/'+deckData.deckId + '/practice/next', config);
+  return response.data;
+}
+const updateRecallability = async(deckData,cardData,recallability,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const response = await axios.patch(
+    API_URL +'decks/'+deckData.deckId + '/cards/'+cardData.cardId + '/recallability', recallability, config);
+  return response.data;
+}
 const dataService = {
   createDeck,
   getDecks,
@@ -71,5 +99,8 @@ const dataService = {
   removeCard,
   deleteDeck,
   getCards,
+  practiceCards,
+  nextCard,
+  updateRecallability,
 }
 export default dataService;

@@ -13,7 +13,7 @@ import { reset } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
 
 
-const CreateDeck = () => {
+const CreateCard = () => {
   const params = useParams();
   const deckId = params.deckid;
   const dispatch = useDispatch();
@@ -103,4 +103,4 @@ const CreateDeck = () => {
   )
 }
 
-export default CreateDeck
+export default CreateCard
