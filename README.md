@@ -26,17 +26,17 @@ https://amgiapp.herokuapp.com/
 ### Installation
 * Start with cloning this repo on your local machine:
 
-  $ git clone https://github.com/neu-seattle-cs5500-summer2022/project-SM22-erkita-vmalecode-stefanisindarto-cathylee12.git
+  `$ git clone https://github.com/neu-seattle-cs5500-summer2022/project-SM22-erkita-vmalecode-stefanisindarto-cathylee12.git`
 
 * To install and set up the library, run:
 
-  $ npm install
+  `$ npm install`
 
 ### Usage
 * Serving the app
   
-  $ npm start
+  `$ npm start`
 
 * Running the tests
 
-  $ npm test
+  `$ npm test`

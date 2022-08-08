@@ -24,6 +24,7 @@ jobs:
           npm i mocha
           npm i chai
           npm i chai-http
+          npm i mochawesome
           npm i sinon
       - name: Run test
         run: npm test

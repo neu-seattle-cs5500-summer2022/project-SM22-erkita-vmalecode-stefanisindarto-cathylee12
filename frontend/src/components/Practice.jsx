@@ -9,28 +9,48 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ReactCardFlip from "react-card-flip";
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { practiceCards, nextCard, updateRecallability } from '../features/dataSlice';
+import { useEffect } from 'react';
+
 export default function Practice() {
   const params = useParams();
-  const deckID = params.deckid;
-  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID)).cards;
-  const testDeck = [
-    {front: "first", back: "first card"},
-    {front: "second", back: "second card"},
-    {front: "third", back: "third card"},
-  ];
-
-  const [index, setIndex] = useState(0);
-
-  function increment() {
-    setIndex(prevIndex => prevIndex + 1 < deck.length ? prevIndex + 1 : 0);
-    console.log(index);
+  const dispatch = useDispatch();
+  const deckId = params.deckid;
+  const { card } = useSelector((state) => state.data);
+  const deckData = {
+    deckId: deckId
   }
+
+  const [firstCardCalled, setFirstCardCalled] = useState(false);
+  //const [next, setNext] = useState(false);
+
+  if (!firstCardCalled) {
+    dispatch(practiceCards(deckData));
+    setFirstCardCalled(true);
+  }
+
+  //useEffect(() => {
+  //  if (!next) dispatch(practiceCards(deckData));
+  //  else dispatch(nextCard(deckData))
+  //}, [])
 
   const [isFlipped, setIsFlipped] = useState(false);
   
-  const handleClick = () => {
+  const handleFlip = () => {
     setIsFlipped(!isFlipped);
+  }
+
+  const handleRecallability = (e, recallability) => {
+    if (card) {
+      const cardData = {
+        cardId: card._id
+      }
+      const newRecallability = {
+        recallability: recallability
+      }
+      dispatch(updateRecallability({ deckData, cardData, newRecallability }));
+    }
   }
   
   return (
@@ -58,7 +78,7 @@ export default function Practice() {
                   component="div"
                   align='center'
                 >
-                  {deck[index].front}
+                  { card ? card.front : "" }
                 </Typography>
               </CardContent>
               <CardActions
@@ -68,7 +88,7 @@ export default function Practice() {
               >
                 <Button
                   variant="contained"
-                  onClick={handleClick}
+                  onClick={handleFlip}
                 >
                   See Back
                 </Button>
@@ -81,7 +101,7 @@ export default function Practice() {
               >
                 <Button
                   variant="contained"
-                  onClick={increment}
+                  onClick={() => /*setNext(true)*/ dispatch(nextCard(deckData))}
                 >
                   Next Card
                 </Button>
@@ -102,7 +122,7 @@ export default function Practice() {
                   component="div"
                   align='center'
                 >
-                  {deck[index].back}
+                  { card ? card.back : "" }
                 </Typography>
               </CardContent>
               <CardActions
@@ -112,7 +132,7 @@ export default function Practice() {
               >
                 <Button
                   variant="contained"
-                  onClick={handleClick}
+                  onClick={handleFlip}
                 >
                   Front
                 </Button>
@@ -123,10 +143,30 @@ export default function Practice() {
                   marginTop: 150
                 }}
               >
-                <Button variant='contained'>again</Button>
-                <Button variant='contained'>hard</Button>
-                <Button variant='contained'>good</Button>
-                <Button variant='contained'>easy</Button>
+                <Button
+                  variant='contained'
+                  onClick={ () => { handleRecallability(deckData, "again") } }
+                >
+                    again
+                </Button>
+                <Button
+                  variant='contained'
+                  onClick={ () => { handleRecallability(deckData, "hard") } }
+                >
+                    hard
+                </Button>
+                <Button
+                  variant='contained'
+                  onClick={ () => { handleRecallability(deckData, "good") } }
+                >
+                    good
+                </Button>
+                <Button
+                  variant='contained'
+                  onClick={ () => { handleRecallability(deckData, "easy") } }
+                >
+                    easy
+                </Button>
               </CardActions>
             </AspectRatio>
           </Card>
