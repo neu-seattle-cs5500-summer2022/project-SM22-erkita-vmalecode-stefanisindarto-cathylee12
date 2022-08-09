@@ -100,18 +100,6 @@ describe("POST Decks", function () {
   });
 });
 
-before(function (done) {
-  chai.request
-    .agent(server)
-    .post("/api/login")
-    .send(userCredentialsLogin)
-    .end(function (err, response) {
-      expect(response.statusCode).to.equal(200);
-      expect("Location", "/view-decks");
-      done();
-    });
-});
-
 /* Need auth part, will be done later
 describe("GET Decks", function () {
   it("GET, get first deck in db", (done) => {
