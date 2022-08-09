@@ -157,7 +157,7 @@ export default function Register() {
                   name="password2"
                   label="Confirm Password"
                   type="password"
-                  id="password"
+                  id="password2"
                   autoComplete="new-password"
                 />
               </Grid>
