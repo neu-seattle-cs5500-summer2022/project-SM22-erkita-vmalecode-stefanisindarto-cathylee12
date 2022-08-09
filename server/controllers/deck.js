@@ -235,18 +235,6 @@ async function practiceDeck(req, res) {
     await cardsArray.save();
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
-    card.interval = nextInterval;
-    card.repetition = nextRepetition;
-    card.efactor = nextEfactor;
-    await card.save();
-    if (cards.length > nextInterval) {
-      cards.splice(nextInterval + 1, 0, card);
-    } else {
-      cards.push(card);
-    }
-    cards.shift();
-    await cardsArray.save();
     res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ messeage: "Something went wrong" });
@@ -281,6 +269,7 @@ async function nextCard(req, res) {
     }
     cards.shift();
     await cardsArray.save();
+    card = await Flashcard.findById(cards[0]);
     res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ message: "Something went wrong." });
