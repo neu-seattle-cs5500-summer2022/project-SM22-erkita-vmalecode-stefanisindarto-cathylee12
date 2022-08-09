@@ -14,7 +14,6 @@ export default function DetailDeck({ deck }) {
     return (<></>)
   }
   const handleDelete = (deck) => {
-    console.log("[deckPopup / handleDelete]:", deck.name);
     dispatch(deleteDeck(deck._id));
   }
   return (
@@ -32,7 +31,7 @@ export default function DetailDeck({ deck }) {
         <Typography variant="body2">
           Deck created: {Moment(deck.dateCreated).format('MMM D, YYYY')}
           <br />
-          Last modified: {Moment(deck.lastReviewed).format('MMM D, YYYY')}
+          Deck Visibility: {deck.public? 'Public': 'Private'}
           <br />
         </Typography>
       </CardContent>

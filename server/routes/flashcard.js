@@ -11,8 +11,8 @@ flashcardRouter.get("/:deckId/cards/:cardId/front", authentication, flashcardCon
 flashcardRouter.get("/:deckId/cards/:cardId/back", authentication, flashcardController.getBack);
 flashcardRouter.get("/:deckId/cards/:cardId/recallability", authentication, flashcardController.getCardRecallability);
 flashcardRouter.delete("/:deckId/cards/:cardId", authentication, flashcardController.deleteCard);
-flashcardRouter.patch("/:deckId/cards/:cardId/front", authentication, flashcardController.updateFront);
-flashcardRouter.patch("/:deckId/cards/:cardId/back", authentication, flashcardController.updateBack);
-flashcardRouter.patch("/:deckId/cards/:cardId/recallability", authentication, flashcardController.updateRecallability);
+// flashcardRouter.patch("/:deckId/cards/:cardId/front", authentication, flashcardController.updateFront);
+// flashcardRouter.patch("/:deckId/cards/:cardId/back", authentication, flashcardController.updateBack);
+// flashcardRouter.patch("/:deckId/cards/:cardId/recallability", authentication, flashcardController.updateRecallability);
 
 module.exports = flashcardRouter;

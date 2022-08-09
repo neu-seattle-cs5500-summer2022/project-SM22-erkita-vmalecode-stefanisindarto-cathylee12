@@ -89,6 +89,16 @@ const updateRecallability = async(deckData,cardData,recallability,token) => {
     API_URL +'decks/'+deckData.deckId + '/cards/'+cardData.cardId + '/recallability', recallability, config);
   return response.data;
 }
+const updateVisibility = async(deckData,token) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  };
+  const response = await axios.patch(
+    API_URL + 'decks/public/'+ deckData.deckId ,deckData, config);
+  return response.data;
+}
 const dataService = {
   createDeck,
   getDecks,
@@ -99,5 +109,6 @@ const dataService = {
   practiceCards,
   nextCard,
   updateRecallability,
+  updateVisibility,
 }
 export default dataService;

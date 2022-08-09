@@ -22,8 +22,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { IoMdAddCircle } from 'react-icons/io';
 import { AiOutlineDoubleRight } from 'react-icons/ai';
+import { MdPublic } from 'react-icons/md';
 import Moment from 'moment';
-import { getDecks, reset, removeCard, getCards } from '../features/dataSlice';
+import { getDecks, reset, removeCard, getCards, updateVisibility } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
 
 
@@ -75,7 +76,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Date Created',
-  },
+  }
 ];
 
 function EnhancedTableHead(props) {
@@ -151,12 +152,17 @@ const EnhancedTableToolbar = (props) => {
       }}
     >
       <Typography
-        sx={{ flex: '1 1 100%' }}
         variant="h6"
         id="tableTitle"
         component="div"
       >
-        <>Amgi Deck: <em>{deck.name}</em></>
+        <div>Amgi Deck: <em>{deck.name}</em></div>
+        <Typography
+          id="tableTitle"
+          component="div"
+        >
+          <div>Visiblity: <em>{deck.public ? 'Public' : 'Private'}</em></div>
+        </Typography>
       </Typography>
 
     </Toolbar>
@@ -232,6 +238,14 @@ export default function EnhancedTable() {
 
     setSelected(newSelected);
   };
+  const handleVisiblityToggle = (e) => {
+    console.log('handleVisiblityToggle');
+    const deckData = {
+      public: !deck.public,
+      deckId: deckId
+    }
+    dispatch(updateVisibility(deckData));
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -282,11 +296,14 @@ export default function EnhancedTable() {
       >
         {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
+
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <Button sx={{ marginLeft: '20px' }} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
         <Button sx={{ marginLeft: '20px' }} component={Link} to={"/practice/" + deck._id} variant="contained" size="large"> <AiOutlineDoubleRight /> &nbsp; Practice </Button>
+        <Button sx={{ marginLeft: '20px' }} onClick = {handleVisiblityToggle} variant="contained" size="large"> <MdPublic /> &nbsp; {!deck.public ? 'Make public' : 'Make Private'} </Button>
 
+        
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
