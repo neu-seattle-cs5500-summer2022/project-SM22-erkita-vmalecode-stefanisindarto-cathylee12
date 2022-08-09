@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState} from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import AspectRatio from '@mui/joy/AspectRatio';
 import Card from '@mui/material/Card';
@@ -9,30 +9,73 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ReactCardFlip from "react-card-flip";
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { practiceCards, nextCard, updateRecallability } from '../features/dataSlice';
+import { useEffect } from 'react';
+
 export default function Practice() {
   const params = useParams();
-  const deckID = params.deckid;
-  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID)).cards;
-  const testDeck = [
-    {front: "first", back: "first card"},
-    {front: "second", back: "second card"},
-    {front: "third", back: "third card"},
-  ];
+  const dispatch = useDispatch();
+  const deckId = params.deckid;
+  const { card } = useSelector((state) => state.data);
+  // The colors of the buttons again, hard, good, easy
+  const defaultColor = '#1565c0';
+  const activeColor = 'black';
+  const [againButtonColor, setAgainButtonColor] = useState(defaultColor);
+  const [hardButtonColor, setHardButtonColor] = useState(defaultColor);
+  const [goodButtonColor, setGoodButtonColor] = useState(defaultColor);
+  const [easyButtonColor, setEasyButtonColor] = useState(defaultColor);
 
-  const [index, setIndex] = useState(0);
-
-  function increment() {
-    setIndex(prevIndex => prevIndex + 1 < deck.length ? prevIndex + 1 : 0);
-    console.log(index);
+  const deckData = {
+    deckId: deckId
   }
+
+  const [firstCardCalled, setFirstCardCalled] = useState(false);
+  //const [next, setNext] = useState(false);
+
+  if (!firstCardCalled) {
+    dispatch(practiceCards(deckData));
+    setFirstCardCalled(true);
+  }
+  // Set card difficulty selection button color
+  useEffect(() => {
+    setAgainButtonColor(defaultColor);
+    setHardButtonColor(defaultColor);
+    setGoodButtonColor(defaultColor);
+    setEasyButtonColor(defaultColor);
+    if (card.recallability === 'again') {
+      setAgainButtonColor(activeColor);
+    }
+    else if (card.recallability === 'hard') {
+      setHardButtonColor(activeColor);
+    }
+    else if (card.recallability === 'good') {
+      setGoodButtonColor(activeColor);
+    }
+    else if (card.recallability === 'easy') {
+      setEasyButtonColor(activeColor);
+    }
+
+  }, [card])
 
   const [isFlipped, setIsFlipped] = useState(false);
-  
-  const handleClick = () => {
+
+  const handleFlip = () => {
     setIsFlipped(!isFlipped);
   }
-  
+
+  const handleRecallability = (e, recallability) => {
+    if (card) {
+      const cardData = {
+        cardId: card._id
+      }
+      const newRecallability = {
+        recallability: recallability
+      }
+      dispatch(updateRecallability({ deckData, cardData, newRecallability }));
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -43,94 +86,126 @@ export default function Practice() {
       }}
       alignItems='center'
     >
-        <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
-          <Card
-            variant="outlined"
-            sx={{
-              width: 500,
-              borderRadius: 5,
-            }}
-          >
-            <AspectRatio>
-              <CardContent>
-                <Typography
-                  variant="h3"
-                  component="div"
-                  align='center'
-                >
-                  {deck[index].front}
-                </Typography>
-              </CardContent>
-              <CardActions
-                style={{
+      <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
+        <Card
+          variant="outlined"
+          sx={{
+            width: 500,
+            borderRadius: 5,
+          }}
+        >
+          <AspectRatio>
+            <CardContent>
+              <Typography
+                variant="h3"
+                component="div"
+                align='center'
+              >
+                {card ? card.front : ""}
+              </Typography>
+            </CardContent>
+            <CardActions
+              style={{
                 justifyContent: 'flex-end',
-                }}
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={handleFlip}
               >
-                <Button
-                  variant="contained"
-                  onClick={handleClick}
-                >
-                  See Back
-                </Button>
-              </CardActions>
-              <CardActions
+                See Back
+              </Button>
+            </CardActions>
+            <CardActions
+              style={{
+                justifyContent: 'flex-end',
+                marginTop: 170
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={() => /*setNext(true)*/ dispatch(nextCard(deckData))}
+              >
+                Next Card
+              </Button>
+            </CardActions>
+          </AspectRatio>
+        </Card>
+        <Card
+          variant="outlined"
+          sx={{
+            minWidth: 500,
+            borderRadius: 5,
+          }}
+        >
+          <AspectRatio>
+            <CardContent>
+              <Typography
+                variant="h3"
+                component="div"
+                align='center'
+              >
+                {card ? card.back : ""}
+              </Typography>
+            </CardContent>
+            <CardActions
+              style={{
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={handleFlip}
+              >
+                Front
+              </Button>
+            </CardActions>
+            <CardActions
+              style={{
+                justifyContent: 'space-evenly',
+                marginTop: 150
+              }}
+            >
+              <Button
+                variant='contained'
+                onClick={() => { handleRecallability(deckData, "again") }}
                 style={{
-                  justifyContent: 'flex-end',
-                  marginTop: 170
+                  backgroundColor: `${ againButtonColor }`
                 }}
               >
-                <Button
-                  variant="contained"
-                  onClick={increment}
-                >
-                  Next Card
-                </Button>
-              </CardActions>
-            </AspectRatio>
-          </Card>
-          <Card
-            variant="outlined"
-            sx={{
-              minWidth: 500,
-              borderRadius: 5,
-            }}
-          >
-            <AspectRatio>
-              <CardContent>
-                <Typography
-                  variant="h3"
-                  component="div"
-                  align='center'
-                >
-                  {deck[index].back}
-                </Typography>
-              </CardContent>
-              <CardActions
+                again
+              </Button>
+              <Button
                 style={{
-                  justifyContent: 'flex-end',
+                  backgroundColor: `${ hardButtonColor }`
                 }}
+                variant='contained'
+                onClick={() => { handleRecallability(deckData, "hard") }}
               >
-                <Button
-                  variant="contained"
-                  onClick={handleClick}
-                >
-                  Front
-                </Button>
-              </CardActions>
-              <CardActions
+                hard
+              </Button>
+              <Button
+                variant='contained'
+                onClick={() => { handleRecallability(deckData, "good") }}
                 style={{
-                  justifyContent: 'space-evenly',
-                  marginTop: 150
+                  backgroundColor: `${ goodButtonColor }`
                 }}
               >
-                <Button variant='contained'>again</Button>
-                <Button variant='contained'>hard</Button>
-                <Button variant='contained'>good</Button>
-                <Button variant='contained'>easy</Button>
-              </CardActions>
-            </AspectRatio>
-          </Card>
-        </ReactCardFlip>
-      </Box>
-    );
-  }
+                good
+              </Button>
+              <Button
+                variant='contained'
+                onClick={() => { handleRecallability(deckData, "easy") }}
+                style={{
+                  backgroundColor: `${ easyButtonColor }`
+                }}
+              >
+                easy
+              </Button>
+            </CardActions>
+          </AspectRatio>
+        </Card>
+      </ReactCardFlip>
+    </Box>
+  );
+}

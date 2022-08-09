@@ -13,12 +13,12 @@ import { reset } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
 
 
-const CreateDeck = () => {
+const CreateCard = () => {
   const params = useParams();
-  const deckID = params.deckid;
+  const deckId = params.deckid;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckID));
+  const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckId));
   const { isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.data
   )
@@ -29,7 +29,7 @@ const CreateDeck = () => {
 
     if (isSuccess) {
       dispatch(reset());
-      navigate('/edit-deck/' + deckID);
+      navigate('/edit-deck/' + deckId);
     }
 
 
@@ -40,7 +40,7 @@ const CreateDeck = () => {
     const front = data.get('front');
     const back = data.get('back');
     const cardData = {
-      deckID,
+      deckId,
       front,
       back,
 
@@ -103,4 +103,4 @@ const CreateDeck = () => {
   )
 }
 
-export default CreateDeck
+export default CreateCard

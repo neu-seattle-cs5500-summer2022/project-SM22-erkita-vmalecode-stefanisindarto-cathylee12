@@ -144,7 +144,7 @@ async function deleteCard(req, res) {
   const { deckId } = req.params;
   const { cardId } = req.params;
   isObjectIdValid(res, deckId, cardId);
-  const deck = await Deck.findById(deckId);
+  const deck = await Deck.findById(req.params.deckId);
   isDeckValid(res, deck);
   isUserValid(req, res, deck);
   try {
@@ -156,7 +156,7 @@ async function deleteCard(req, res) {
         { _id: req.params.deckId },
         { $pullAll: { cards: [ { _id: cardId } ] } }
       );
-      res.status(200).json({ message: "Card deleted successfully" });
+      res.status(200).json({ message: "Card deleted successfully",cardId: cardId });
     }
   } catch (err) {
     res.status(400).json({ message: err.message });

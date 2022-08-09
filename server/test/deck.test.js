@@ -252,115 +252,136 @@ describe("DELETE Invalid Decks", function () {
 });
 */
 
-
 let practiceDeckId;
 describe("Practice cards", function () {
-
-  middlewareStub =
-    sinon
-      .stub(authentication, 'authentication')
-      .callsFake((req, res, next) => { next() });
-
-  it("CREATE a test deck for practice", function (done) {
-    chai
-      .request(server)
-      .post("/api/decks/")
-      .send({ name: "test deck for practice" })
-      .end(function (err, res) {
-        res.should.have.status(201);
-        practiceDeckId = res.body['_id'];
-        done();
+  this.beforeEach(() => {
+    middlewareStub = sinon
+      .stub(authentication, "authentication")
+      .callsFake((req, res, next) => {
+        next();
       });
+
+    it("CREATE a test deck for practice", function (done) {
+      chai
+        .request(server)
+        .post("/api/decks/")
+        .send({ name: "test deck for practice" })
+        .end(function (err, res) {
+          res.should.have.status(201);
+          practiceDeckId = res.body["_id"];
+          done();
+        });
+    });
+
+    it("again, repetition: 0, interval: 0 => interval: 1", function (done) {
+      chai
+        .request(server)
+        .post("/api/decks/" + practiceDeckId + "/cards")
+        .send({
+          front: "front1",
+          back: "back1",
+        })
+        .end(function (err, res) {
+          res.should.have.status(201);
+          res.body.should.have.property("interval").eql(0);
+          res.body.should.have.property("repetition").eql(0);
+          res.body.should.have.property("efactor").eql(2.5);
+          chai
+            .request(server)
+            .get("/api/decks/" + practiceDeckId + "/practice")
+            .end(function (err, res) {
+              res.should.have.status(200);
+              chai
+                .request(server)
+                .get(
+                  "/api/decks/" + practiceDeckId + "/cards/" + res.body["_id"]
+                )
+                .end(function (err, res) {
+                  res.should.have.status(200);
+                  res.body.should.have.property("interval").eql(1);
+                  chai
+                    .request(server)
+                    .delete(
+                      "/api/decks/" +
+                        practiceDeckId +
+                        "/cards/" +
+                        res.body["_id"]
+                    )
+                    .end(function (err, res) {
+                      res.should.have.status(200);
+                      done();
+                    });
+                });
+            });
+        });
+    });
+
+    it("good, repetition: 1, interval: 1 => interval: 6", function (done) {
+      chai
+        .request(server)
+        .post("/api/decks/" + practiceDeckId + "/cards")
+        .send({
+          front: "front2",
+          back: "back2",
+        })
+        .end(function (err, res) {
+          res.should.have.status(201);
+          chai
+            .request(server)
+            .patch(
+              "/api/decks/" +
+                practiceDeckId +
+                "/cards/" +
+                res.body["_id"] +
+                "/recallability"
+            )
+            .send({ recallability: "good" })
+            .end(function (err, res) {
+              res.should.have.status(200);
+              chai
+                .request(server)
+                .get("/api/decks/" + practiceDeckId + "/practice")
+                .end(function (err, res) {
+                  res.should.have.status(200);
+                  res.body.should.have.property("repetition").eql(0);
+                  res.body.should.have.property("interval").eql(0);
+                  chai
+                    .request(server)
+                    .get("/api/decks/" + practiceDeckId + "/practice/next")
+                    .end(function (err, res) {
+                      res.should.have.status(200);
+                      res.body.should.have.property("repetition").eql(1);
+                      res.body.should.have.property("interval").eql(1);
+                      chai
+                        .request(server)
+                        .get(
+                          "/api/decks/" +
+                            practiceDeckId +
+                            "/cards/" +
+                            res.body["_id"]
+                        )
+                        .end(function (err, res) {
+                          res.should.have.status(200);
+                          res.body.should.have.property("interval").eql(6);
+                          done();
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it("Restore DB", function (done) {
+      chai
+        .request(server)
+        .delete("/api/decks/" + practiceDeckId)
+        .end(function (err, res) {
+          res.should.have.status(200);
+          done();
+        });
+    });
   });
-
-  it("again, repetition: 0, interval: 0 => interval: 1", function (done) {
-    chai
-      .request(server)
-      .post("/api/decks/" + practiceDeckId + "/cards")
-      .send({
-        front: "front1",
-        back: "back1"
-      })
-      .end(function (err, res) {
-        res.should.have.status(201);
-        res.body.should.have.property('interval').eql(0);
-        res.body.should.have.property('repetition').eql(0);
-        res.body.should.have.property('efactor').eql(2.5);
-        chai
-          .request(server)
-          .get("/api/decks/" + practiceDeckId + "/practice")
-          .end(function (err, res) {
-            res.should.have.status(200);
-            chai
-              .request(server)
-              .get("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
-              .end(function (err, res) {
-                res.should.have.status(200);
-                res.body.should.have.property('interval').eql(1);
-                chai
-                  .request(server)
-                  .delete("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
-                  .end(function (err, res) {
-                    res.should.have.status(200);
-                    done();
-                  });
-              });
-          });
-      });
-  });
-
-  it("good, repetition: 1, interval: 1 => interval: 6", function (done) {
-    chai
-      .request(server)
-      .post("/api/decks/" + practiceDeckId + "/cards")
-      .send({
-        front: "front2",
-        back: "back2",
-      })
-      .end(function (err, res) {
-        res.should.have.status(201);
-        chai
-          .request(server)
-          .patch("/api/decks/" + practiceDeckId +
-                  "/cards/" + res.body['_id'] + "/recallability")
-          .send({ recallability: "good" })
-          .end(function (err, res) {
-            res.should.have.status(200);
-            chai
-              .request(server)
-              .get("/api/decks/" + practiceDeckId + "/practice")
-              .end(function (err, res) {
-                res.should.have.status(200);
-                res.body.should.have.property('repetition').eql(0);
-                res.body.should.have.property('interval').eql(0);
-                chai
-                  .request(server)
-                  .get("/api/decks/" + practiceDeckId + "/practice/next")
-                  .end(function (err, res) {
-                    res.should.have.status(200);
-                    res.body.should.have.property('repetition').eql(1);
-                    res.body.should.have.property('interval').eql(1);
-                    chai
-                      .request(server)
-                      .get("/api/decks/" + practiceDeckId + "/cards/" + res.body['_id'])
-                      .end(function (err, res) {
-                        res.should.have.status(200);
-                        res.body.should.have.property('interval').eql(6);
-                        done();
-                      });
-                  });
-              });
-          });
-      });
-  });
-
-  it("Restore DB", function (done) {
-    chai
-      .request(server)
-      .delete("/api/decks/" + practiceDeckId)
-      .end(function (err, res) {
-        res.should.have.status(200);
-        done();
-      });
+  this.afterEach(() => {
+    middlewareStub.restore();
   });
 });

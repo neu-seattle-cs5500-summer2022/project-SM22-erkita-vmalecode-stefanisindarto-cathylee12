@@ -90,7 +90,6 @@ async function removeFlashcard(req,res) {
       res.status(403);
       return
     }
-    console.log('[deckController/removeFlashcard]',req.body);
     cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
     await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
       $pull: { cards: {_id: req.body.cardID} }
@@ -236,7 +235,6 @@ async function practiceDeck(req, res) {
     await cardsArray.save();
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    res.status(200).json(card);
     let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
     card.interval = nextInterval;
     card.repetition = nextRepetition;
@@ -249,6 +247,7 @@ async function practiceDeck(req, res) {
     }
     cards.shift();
     await cardsArray.save();
+    res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ messeage: "Something went wrong" });
   }
@@ -270,7 +269,6 @@ async function nextCard(req, res) {
   try {
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    res.status(200).json(card);
     let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
     card.interval = nextInterval;
     card.repetition = nextRepetition;
@@ -283,6 +281,7 @@ async function nextCard(req, res) {
     }
     cards.shift();
     await cardsArray.save();
+    res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ message: "Something went wrong." });
   }
