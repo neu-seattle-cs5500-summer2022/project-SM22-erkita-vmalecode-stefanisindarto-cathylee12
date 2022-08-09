@@ -233,7 +233,6 @@ export default function EnhancedTable() {
   };
   
   const handlePractice = (e) => {
-    console.log(e.cards.length);
     if(e.cards.length > 0) {
       navigate('/practice/'+e._id);
     }

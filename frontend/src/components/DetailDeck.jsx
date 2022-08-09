@@ -26,6 +26,11 @@ import { MdPublic } from 'react-icons/md';
 import Moment from 'moment';
 import { getDecks, reset, removeCard, getCards, updateVisibility } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 
 
@@ -182,6 +187,9 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+  const [err, setErr] = React.useState(false);
+  const [eMsg, setEmsg] = React.useState('');
+
   Moment.locale('en');
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -245,7 +253,20 @@ export default function EnhancedTable() {
     }
     dispatch(updateVisibility(deckData));
   };
+  const handlePractice = () => {
+    if(deck.cards.length > 0) {
+      navigate("/practice/" + deck._id);
+    }
+    else {
+      setEmsg('Please add cards to practice');
+      setErr(true);
+    }
 
+  };
+  
+  const handleClose = (e) => {
+    setErr(false);
+  }
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -279,7 +300,7 @@ export default function EnhancedTable() {
     dispatch(reset());
   }, [deck]);
   return (
-
+    
     <Box sx={{
       width: '100%',
       display: "flex",
@@ -287,6 +308,11 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
+      <Snackbar open={err} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          {eMsg}
+        </Alert>
+      </Snackbar>
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -299,7 +325,7 @@ export default function EnhancedTable() {
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <Button sx={{ marginLeft: '20px' }} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
-        <Button sx={{ marginLeft: '20px' }} component={Link} to={"/practice/" + deck._id} variant="contained" size="large"> <AiOutlineDoubleRight /> &nbsp; Practice </Button>
+        <Button sx={{ marginLeft: '20px' }} onClick = {handlePractice} variant="contained" size="large"> <AiOutlineDoubleRight /> &nbsp; Practice </Button>
         <Button sx={{ marginLeft: '20px' }} onClick = {handleVisiblityToggle} variant="contained" size="large"> <MdPublic /> &nbsp; {!deck.public ? 'Make public' : 'Make Private'} </Button>
 
         
