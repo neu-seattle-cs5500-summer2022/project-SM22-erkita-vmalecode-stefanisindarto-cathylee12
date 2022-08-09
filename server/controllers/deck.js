@@ -7,7 +7,6 @@ const intervalCalculator = require("./intervalCalculator.js");
 
 const {
   getCards,
-  deleteCard,
 } = require("./flashcard.js");
 
 const invalidTokenMessage = "Authentication not valid";
@@ -81,58 +80,6 @@ async function createDeck(req, res) {
   }
 }
 
-/*
-async function removeFlashcard(req,res) {
-  try {
-    // Verify authorization:
-    let deck = await DeckSchema.findById(req.body.deckID);
-    if (deck.userId !== req.userId) {
-      res.status(403);
-      return
-    }
-    cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
-    await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
-      $pull: { cards: {_id: req.body.cardID} }
-    }).exec();
-    deck = await DeckSchema.findById(req.body.deckID);
-
-    console.log('[deckController/removeFlashcard] remove: deck cards: ',deck.cards);
-    
-    res.status(200).json(req.body);
-
-  } catch (error) {
-    res.status(500).json({ message: "error deleting card"});
-    console.log(error);
-  }
-}
-async function pushFlashcard(req,res) {
-  
-  try {
-    // Verify Authorization
-    const deck = await DeckSchema.findById(req.body.deckID)
-    console.log(deck)
-    if (deck.userId !== req.userId) {
-      res.status(403);
-      return
-    }
-    const newCard = {
-      front: req.body.front,
-      back: req.body.back,
-      deckId: req.body.deckID
-    };
-    await DeckSchema.findOneAndUpdate({_id:req.body.deckID},{
-      $push: {
-        cards: newCard
-      }
-    });
-    res.status(200).json(newCard);
-
-  } catch (error) {
-    res.status(500).json({ message: "error creating card"});
-    console.log(error);
-  }
-}
-*/
 async function getDeck(req, res) {
   const { id } = req.params;
   isObjectIdValid(res, id);
@@ -235,18 +182,6 @@ async function practiceDeck(req, res) {
     await cardsArray.save();
     let cards = cardsArray.cards;
     let card = await Flashcard.findById(cards[0]);
-    let { nextInterval, nextRepetition, nextEfactor } = intervalCalculator(card);
-    card.interval = nextInterval;
-    card.repetition = nextRepetition;
-    card.efactor = nextEfactor;
-    await card.save();
-    if (cards.length > nextInterval) {
-      cards.splice(nextInterval + 1, 0, card);
-    } else {
-      cards.push(card);
-    }
-    cards.shift();
-    await cardsArray.save();
     res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ messeage: "Something went wrong" });
@@ -281,6 +216,7 @@ async function nextCard(req, res) {
     }
     cards.shift();
     await cardsArray.save();
+    card = await Flashcard.findById(cards[0]);
     res.status(200).json(card);
   } catch (error) {
     res.status(400).json({ message: "Something went wrong." });
@@ -296,10 +232,6 @@ module.exports = {
   updateDeckName,
   updatePublicDeck,
   deleteDeck,
-  /*
-  pushFlashcard,
-  removeFlashcard,
-  */
   practiceDeck,
   nextCard,
 };

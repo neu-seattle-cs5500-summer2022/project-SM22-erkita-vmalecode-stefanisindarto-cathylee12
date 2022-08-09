@@ -91,6 +91,12 @@ const headCells = [
     disablePadding: false,
     label: 'Created On',
   },
+  {
+    id: 'visibility',
+    numeric: true,
+    disablePadding: false,
+    label: 'Visibility',
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -227,7 +233,6 @@ export default function EnhancedTable() {
   };
   
   const handlePractice = (e) => {
-    console.log(e.cards.length);
     if(e.cards.length > 0) {
       navigate('/practice/'+e._id);
     }
@@ -357,6 +362,8 @@ export default function EnhancedTable() {
                       </TableCell>
                       <TableCell align="right">{row.cards.length}</TableCell>
                       <TableCell align="right">{Moment(row.dateCreated).format('MMM D, YYYY')}</TableCell>
+                      <TableCell align="right">{row.public? 'Public': 'Private'}</TableCell>
+
                     </TableRow>
                   );
                 })}

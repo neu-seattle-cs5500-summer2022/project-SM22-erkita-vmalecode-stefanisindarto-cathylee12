@@ -20,37 +20,17 @@ import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { IoMdAddCircle } from 'react-icons/io'
+import { IoMdAddCircle } from 'react-icons/io';
+import { AiOutlineDoubleRight } from 'react-icons/ai';
+import { MdPublic } from 'react-icons/md';
 import Moment from 'moment';
-import { getDecks, reset, removeCard, getCards } from '../features/dataSlice';
+import { getDecks, reset, removeCard, getCards, updateVisibility } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
-
-
-function createData(name, calories, fat, carbs, protein) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  };
-}
-
-let rows = [
-  createData('Words', 305, 3.7, 67, 4.3),
-  createData('Python', 452, 25.0, 51, 4.9),
-  createData('Java', 262, 16.0, 24, 6.0),
-  createData('CS 5500', 159, 6.0, 24, 4.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Bees', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwichs', 237, 9.0, 37, 4.3),
-  createData('Jelly Beans', 375, 0.0, 94, 0.0),
-  createData('Leetcode', 518, 26.0, 65, 7.0),
-  createData('JS', 392, 0.2, 98, 0.0),
-  createData('MERN Stack', 318, 0, 81, 2.0),
-  createData('Deck Name', 360, 19.0, 9, 37.0),
-  createData('Hello', 437, 18.0, 63, 4.0),
-];
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -97,7 +77,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Date Created',
-  },
+  }
 ];
 
 function EnhancedTableHead(props) {
@@ -170,19 +150,20 @@ const EnhancedTableToolbar = (props) => {
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        // ...(numSelected > 0 && {
-        //   bgcolor: (theme) =>
-        //     alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        // }),
       }}
     >
       <Typography
-        sx={{ flex: '1 1 100%' }}
         variant="h6"
         id="tableTitle"
         component="div"
       >
-        <>Amgi Deck: <em>{deck.name}</em></>
+        <div>Amgi Deck: <em>{deck.name}</em></div>
+        <Typography
+          id="tableTitle"
+          component="div"
+        >
+          <div>Visiblity: <em>{deck.public ? 'Public' : 'Private'}</em></div>
+        </Typography>
       </Typography>
 
     </Toolbar>
@@ -202,6 +183,9 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [open, setOpen] = React.useState(false);
   const [selectedDeck, setSelectedDeck] = React.useState(null);
+  const [err, setErr] = React.useState(false);
+  const [eMsg, setEmsg] = React.useState('');
+
   Moment.locale('en');
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -258,7 +242,27 @@ export default function EnhancedTable() {
 
     setSelected(newSelected);
   };
+  const handleVisiblityToggle = (e) => {
+    const deckData = {
+      public: !deck.public,
+      deckId: deckId
+    }
+    dispatch(updateVisibility(deckData));
+  };
+  const handlePractice = () => {
+    if(deck.cards.length > 0) {
+      navigate("/practice/" + deck._id);
+    }
+    else {
+      setEmsg('Please add cards to practice');
+      setErr(true);
+    }
 
+  };
+  
+  const handleClose = (e) => {
+    setErr(false);
+  }
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -282,7 +286,7 @@ export default function EnhancedTable() {
   const deckId = params.deckid;
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckId));
   const cards = useSelector((state) => state.data.activeDeck);
-  rows = cards;
+  const rows = cards;
   useEffect(() => {
     dispatch(reset());
     dispatch(getDecks());
@@ -292,7 +296,7 @@ export default function EnhancedTable() {
     dispatch(reset());
   }, [deck]);
   return (
-
+    
     <Box sx={{
       width: '100%',
       display: "flex",
@@ -300,6 +304,11 @@ export default function EnhancedTable() {
       alignItems: 'center',
       marginTop: '100px'
     }} >
+      <Snackbar open={err} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          {eMsg}
+        </Alert>
+      </Snackbar>
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -308,9 +317,14 @@ export default function EnhancedTable() {
       >
         {open ? (<DeckPopUp deck={selectedDeck} />) : (<></>)}
       </Backdrop>
+
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <Button sx={{ marginLeft: '20px' }} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button sx={{ marginLeft: '20px' }} onClick = {handlePractice} variant="contained" size="large"> <AiOutlineDoubleRight /> &nbsp; Practice </Button>
+        <Button sx={{ marginLeft: '20px' }} onClick = {handleVisiblityToggle} variant="contained" size="large"> <MdPublic /> &nbsp; {!deck.public ? 'Make public' : 'Make Private'} </Button>
+
+        
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
@@ -343,9 +357,12 @@ export default function EnhancedTable() {
                       key={row._id}
                     >
                       <TableCell >
-                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button onClick={() => handleDelete(row)}>Delete</Button>
-                          <Button onClick={() => handleEdit(row)}>Edit</Button>
+                        <ButtonGroup sx={{
+                              marginLeft: '20px',
+                              marginRight: '20px'
+                            }}
+                            variant="contained" aria-label="outlined primary button group">
+                          <Button onClick={() => handleDelete(row)}> Delete </Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell

@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { practiceCards, nextCard, updateRecallability } from '../features/dataSlice';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 export default function Practice() {
   const params = useParams();
@@ -25,34 +26,31 @@ export default function Practice() {
   const [hardButtonColor, setHardButtonColor] = useState(defaultColor);
   const [goodButtonColor, setGoodButtonColor] = useState(defaultColor);
   const [easyButtonColor, setEasyButtonColor] = useState(defaultColor);
-
+  const navigate = useNavigate();
   const deckData = {
     deckId: deckId
   }
 
-  const [firstCardCalled, setFirstCardCalled] = useState(false);
-  //const [next, setNext] = useState(false);
-
-  if (!firstCardCalled) {
+  useEffect(() => {
     dispatch(practiceCards(deckData));
-    setFirstCardCalled(true);
-  }
+  }, [navigate])
+
   // Set card difficulty selection button color
   useEffect(() => {
     setAgainButtonColor(defaultColor);
     setHardButtonColor(defaultColor);
     setGoodButtonColor(defaultColor);
     setEasyButtonColor(defaultColor);
-    if (card.recallability === 'again') {
+    if (card?.recallability === 'again') {
       setAgainButtonColor(activeColor);
     }
-    else if (card.recallability === 'hard') {
+    else if (card?.recallability === 'hard') {
       setHardButtonColor(activeColor);
     }
-    else if (card.recallability === 'good') {
+    else if (card?.recallability === 'good') {
       setGoodButtonColor(activeColor);
     }
-    else if (card.recallability === 'easy') {
+    else if (card?.recallability === 'easy') {
       setEasyButtonColor(activeColor);
     }
 
@@ -124,7 +122,7 @@ export default function Practice() {
             >
               <Button
                 variant="contained"
-                onClick={() => /*setNext(true)*/ dispatch(nextCard(deckData))}
+                onClick={() => dispatch(nextCard(deckData))}
               >
                 Next Card
               </Button>
@@ -170,14 +168,14 @@ export default function Practice() {
                 variant='contained'
                 onClick={() => { handleRecallability(deckData, "again") }}
                 style={{
-                  backgroundColor: `${ againButtonColor }`
+                  backgroundColor: `${againButtonColor}`
                 }}
               >
                 again
               </Button>
               <Button
                 style={{
-                  backgroundColor: `${ hardButtonColor }`
+                  backgroundColor: `${hardButtonColor}`
                 }}
                 variant='contained'
                 onClick={() => { handleRecallability(deckData, "hard") }}
@@ -188,7 +186,7 @@ export default function Practice() {
                 variant='contained'
                 onClick={() => { handleRecallability(deckData, "good") }}
                 style={{
-                  backgroundColor: `${ goodButtonColor }`
+                  backgroundColor: `${goodButtonColor}`
                 }}
               >
                 good
@@ -197,7 +195,7 @@ export default function Practice() {
                 variant='contained'
                 onClick={() => { handleRecallability(deckData, "easy") }}
                 style={{
-                  backgroundColor: `${ easyButtonColor }`
+                  backgroundColor: `${easyButtonColor}`
                 }}
               >
                 easy

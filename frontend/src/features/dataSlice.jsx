@@ -76,7 +76,6 @@ export const getCards = createAsyncThunk(
   'data/getCards',
   async (deckData, thunkAPI) => {
     try {
-      console.log('[dataSlice/getCards] DeckId:' + deckData.deckId);
       const token = thunkAPI.getState().auth.user.token;
       return await dataService.getCards(deckData, token);
     } catch (error) {
@@ -111,10 +110,22 @@ export const nextCard = createAsyncThunk(
 );
 export const updateRecallability = createAsyncThunk(
   'data/updateRecallability',
-  async ({deckData, cardData, newRecallability}, thunkAPI) => {
+  async ({ deckData, cardData, newRecallability }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
       return await dataService.updateRecallability(deckData, cardData, newRecallability, token);
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+export const updateVisibility = createAsyncThunk(
+  'data/updateVisibility',
+  async (deckData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await dataService.updateVisibility(deckData, token);
     } catch (error) {
       const message = error.response.data.message;
       return thunkAPI.rejectWithValue(message);
@@ -139,9 +150,13 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(updateVisibility.fulfilled, (state, action) => {
+        const deck = state.decks.find((deck) => deck._id === action.payload._id);
+        deck.public = action.payload.public;
+      })
       .addCase(removeCard.fulfilled, (state, action) => {
-        const idx = getIdx(state.activeDeck,action.payload.cardId);
-        state.activeDeck.splice(idx,1);
+        const idx = getIdx(state.activeDeck, action.payload.cardId);
+        state.activeDeck.splice(idx, 1);
       })
       .addCase(getCards.fulfilled, (state, action) => {
         state.activeDeck = action.payload;
