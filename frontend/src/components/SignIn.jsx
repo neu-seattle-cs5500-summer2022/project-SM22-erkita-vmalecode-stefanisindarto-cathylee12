@@ -21,8 +21,8 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="https://opensource.org/licenses/MIT">
+        Amgi App
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -124,9 +124,7 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
+
               </Grid>
               <Grid item>
               <Linkto to='/register'>

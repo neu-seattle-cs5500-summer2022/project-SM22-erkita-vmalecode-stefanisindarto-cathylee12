@@ -41,16 +41,16 @@ export default function Practice() {
     setHardButtonColor(defaultColor);
     setGoodButtonColor(defaultColor);
     setEasyButtonColor(defaultColor);
-    if (card.recallability === 'again') {
+    if (card?.recallability === 'again') {
       setAgainButtonColor(activeColor);
     }
-    else if (card.recallability === 'hard') {
+    else if (card?.recallability === 'hard') {
       setHardButtonColor(activeColor);
     }
-    else if (card.recallability === 'good') {
+    else if (card?.recallability === 'good') {
       setGoodButtonColor(activeColor);
     }
-    else if (card.recallability === 'easy') {
+    else if (card?.recallability === 'easy') {
       setEasyButtonColor(activeColor);
     }
 
