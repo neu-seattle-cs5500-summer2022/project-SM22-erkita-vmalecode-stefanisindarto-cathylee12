@@ -13,12 +13,7 @@ const Landing = () => {
   const { user } = useSelector((state) => state.auth);
   const decks = useSelector((state) => state.data.decks);
   Moment.locale('en');
-  useEffect(()=> {
-    if (user) {
-      // navigate('/view-decks');
-    }
-    
-  },[navigate]);
+
   return (<>
     <Typography
     variant="h6"

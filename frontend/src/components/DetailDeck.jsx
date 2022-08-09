@@ -20,37 +20,15 @@ import Backdrop from '@mui/material/Backdrop';
 import DeckPopUp from './DeckPopUp';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { IoMdAddCircle } from 'react-icons/io'
+import { IoMdAddCircle } from 'react-icons/io';
+import { AiOutlineDoubleRight } from 'react-icons/ai';
 import Moment from 'moment';
 import { getDecks, reset, removeCard, getCards } from '../features/dataSlice';
 import { useState, useEffect } from 'react';
 
 
-function createData(name, calories, fat, carbs, protein) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  };
-}
 
-let rows = [
-  createData('Words', 305, 3.7, 67, 4.3),
-  createData('Python', 452, 25.0, 51, 4.9),
-  createData('Java', 262, 16.0, 24, 6.0),
-  createData('CS 5500', 159, 6.0, 24, 4.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Bees', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwichs', 237, 9.0, 37, 4.3),
-  createData('Jelly Beans', 375, 0.0, 94, 0.0),
-  createData('Leetcode', 518, 26.0, 65, 7.0),
-  createData('JS', 392, 0.2, 98, 0.0),
-  createData('MERN Stack', 318, 0, 81, 2.0),
-  createData('Deck Name', 360, 19.0, 9, 37.0),
-  createData('Hello', 437, 18.0, 63, 4.0),
-];
+
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -170,10 +148,6 @@ const EnhancedTableToolbar = (props) => {
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        // ...(numSelected > 0 && {
-        //   bgcolor: (theme) =>
-        //     alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        // }),
       }}
     >
       <Typography
@@ -282,7 +256,7 @@ export default function EnhancedTable() {
   const deckId = params.deckid;
   const deck = useSelector((state) => state.data.decks.find((deck) => deck._id === deckId));
   const cards = useSelector((state) => state.data.activeDeck);
-  rows = cards;
+  const rows = cards;
   useEffect(() => {
     dispatch(reset());
     dispatch(getDecks());
@@ -311,6 +285,8 @@ export default function EnhancedTable() {
       <Paper sx={{ width: { sm: '100%', md: '50%' }, mb: 2 }} >
         <EnhancedTableToolbar numSelected={selected.length} />
         <Button sx={{ marginLeft: '20px' }} component={Link} to={"/create-card/" + deck._id} variant="contained" size="large"> <IoMdAddCircle /> &nbsp; Add new Card </Button>
+        <Button sx={{ marginLeft: '20px' }} component={Link} to={"/practice/" + deck._id} variant="contained" size="large"> <AiOutlineDoubleRight /> &nbsp; Practice </Button>
+
         <TableContainer >
           <Table
             sx={{ minWidth: 750 }}
