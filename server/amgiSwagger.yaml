@@ -10,8 +10,8 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "swagger.io"
-basePath: "/v2"
+host: "amgiapi.herokuapp.com"
+basePath: "/"
 tags:
   - name: "decks"
     description: "Manage flashcard decks here"
@@ -70,7 +70,7 @@ paths:
             $ref: "#/definitions/Decks"
         "404":
           description: "Decks does not exist"
-  /api/deck/{deckId}:
+  /api/decks/{deckId}:
     get:
       tags:
         - "decks"
@@ -94,7 +94,6 @@ paths:
             $ref: "#/definitions/Decks"
         "404":
           description: "Deck with ID "
-
     patch:
       tags:
         - "decks"
@@ -107,6 +106,11 @@ paths:
           description: "ID of deck to retrieve"
           required: true
           type: "string"
+        - in: "body"
+          name: "name"
+          required: true
+          schema:
+            $ref: "#/definitions/Flashcard"
       responses:
         "200":
           description: "Successfully changed deck name"
@@ -133,7 +137,31 @@ paths:
           description: "Deck deleted"
         "404":
           description: "Could not delete deck with invalid ID"
-
+  /api/decks/{deckId}/public:
+    patch:
+      tags:
+        - "decks"
+      summary: "Patch deck status to public"
+      description: "Update public status of a deck"
+      operationId: "updatePublicDeck"
+      parameters:
+        - name: "deckId"
+          in: "path"
+          description: "ID of deck to retrieve"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "public"
+          required: true
+          schema:
+            $ref: "#/definitions/Decks"
+      responses:
+        "200":
+          description: "Successfully changed deck status"
+          schema:
+            $ref: "#/definitions/Decks"
+        "404":
+          description: "Valid name required"
   /api/decks/{deckId}/cards:
     post:
       tags:
@@ -142,7 +170,7 @@ paths:
       description: "Add a new flashcard to specified deck"
       operationId: "createCard"
       consumes:
-        - "applicaiton/json"
+        - "application/json"
       produces:
         - "application/json"
       parameters:
@@ -287,7 +315,7 @@ paths:
           required: true
           type: "string"
         - in: "body"
-          name: "new front field"
+          name: "front"
           required: true
           schema:
             type: object
