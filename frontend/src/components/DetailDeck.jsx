@@ -32,10 +32,6 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-
-
-
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -361,9 +357,12 @@ export default function EnhancedTable() {
                       key={row._id}
                     >
                       <TableCell >
-                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                          <Button onClick={() => handleDelete(row)}>Delete</Button>
-                          <Button onClick={() => handleEdit(row)}>Edit</Button>
+                        <ButtonGroup sx={{
+                              marginLeft: '20px',
+                              marginRight: '20px'
+                            }}
+                            variant="contained" aria-label="outlined primary button group">
+                          <Button onClick={() => handleDelete(row)}> Delete </Button>
                         </ButtonGroup>
                       </TableCell>
                       <TableCell
