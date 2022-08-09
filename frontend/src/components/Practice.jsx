@@ -31,7 +31,6 @@ export default function Practice() {
   }
 
   const [firstCardCalled, setFirstCardCalled] = useState(false);
-  //const [next, setNext] = useState(false);
 
   if (!firstCardCalled) {
     dispatch(practiceCards(deckData));
@@ -124,7 +123,7 @@ export default function Practice() {
             >
               <Button
                 variant="contained"
-                onClick={() => /*setNext(true)*/ dispatch(nextCard(deckData))}
+                onClick={() => dispatch(nextCard(deckData))}
               >
                 Next Card
               </Button>
