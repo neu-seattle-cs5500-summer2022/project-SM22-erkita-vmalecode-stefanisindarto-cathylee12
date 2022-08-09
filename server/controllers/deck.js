@@ -7,7 +7,6 @@ const intervalCalculator = require("./intervalCalculator.js");
 
 const {
   getCards,
-  deleteCard,
 } = require("./flashcard.js");
 
 const invalidTokenMessage = "Authentication not valid";
@@ -81,58 +80,6 @@ async function createDeck(req, res) {
   }
 }
 
-/*
-async function removeFlashcard(req,res) {
-  try {
-    // Verify authorization:
-    let deck = await DeckSchema.findById(req.body.deckID);
-    if (deck.userId !== req.userId) {
-      res.status(403);
-      return
-    }
-    cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cards' }];
-    await DeckSchema.findOneAndUpdate({_id:req.body.deckID}, {
-      $pull: { cards: {_id: req.body.cardID} }
-    }).exec();
-    deck = await DeckSchema.findById(req.body.deckID);
-
-    console.log('[deckController/removeFlashcard] remove: deck cards: ',deck.cards);
-    
-    res.status(200).json(req.body);
-
-  } catch (error) {
-    res.status(500).json({ message: "error deleting card"});
-    console.log(error);
-  }
-}
-async function pushFlashcard(req,res) {
-  
-  try {
-    // Verify Authorization
-    const deck = await DeckSchema.findById(req.body.deckID)
-    console.log(deck)
-    if (deck.userId !== req.userId) {
-      res.status(403);
-      return
-    }
-    const newCard = {
-      front: req.body.front,
-      back: req.body.back,
-      deckId: req.body.deckID
-    };
-    await DeckSchema.findOneAndUpdate({_id:req.body.deckID},{
-      $push: {
-        cards: newCard
-      }
-    });
-    res.status(200).json(newCard);
-
-  } catch (error) {
-    res.status(500).json({ message: "error creating card"});
-    console.log(error);
-  }
-}
-*/
 async function getDeck(req, res) {
   const { id } = req.params;
   isObjectIdValid(res, id);
@@ -285,10 +232,6 @@ module.exports = {
   updateDeckName,
   updatePublicDeck,
   deleteDeck,
-  /*
-  pushFlashcard,
-  removeFlashcard,
-  */
   practiceDeck,
   nextCard,
 };
