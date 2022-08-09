@@ -239,7 +239,6 @@ export default function EnhancedTable() {
     setSelected(newSelected);
   };
   const handleVisiblityToggle = (e) => {
-    console.log('handleVisiblityToggle');
     const deckData = {
       public: !deck.public,
       deckId: deckId
